@@ -1,0 +1,7 @@
+{
+	"dc.containers.empty": "The container is empty.",
+	"dc.containers.qty": "Qty",
+	"dc.containers.take": "Take",
+	"dc.containers.take_all": "Take All",
+	"dc.containers.already_looted": "You have already looted this container."
+}

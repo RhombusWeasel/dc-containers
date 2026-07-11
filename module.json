@@ -1,0 +1,43 @@
+{
+  "id": "dc-containers",
+  "title": "Deadlands Classic — Containers & Loot",
+  "description": "Container and loot module for the Deadlands Classic system. Provides an 'open_container' boon type that opens a player-facing container UI. Configure treasure chests, search rewards, and NPC death drops by chaining boons in the boon editor (roll_gate → open_container, pause_game in fail_boons).",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "RhombusWeasel"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "socket": true,
+  "esmodules": [
+    "module/main.js"
+  ],
+  "styles": [
+    "styles/dc-containers.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "Deadlands-Classic",
+        "type": "system",
+        "compatibility": {
+          "minimum": "0.1.0"
+        }
+      }
+    ]
+  },
+  "url": "",
+  "manifest": "",
+  "download": ""
+}

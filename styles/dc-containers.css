@@ -1,0 +1,72 @@
+/* dc-containers — Container & Loot CSS */
+
+.deadlands-classic .dc-container-sheet {
+	min-height: 200px;
+}
+
+.deadlands-classic .dc-container-empty {
+	padding: 2em;
+	font-style: italic;
+}
+
+.deadlands-classic .dc-container-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.deadlands-classic .dc-container-table th {
+	padding: 4px 6px;
+	border-bottom: 2px solid var(--dc-border-color, #8b7355);
+}
+
+.deadlands-classic .dc-container-table td {
+	padding: 3px 6px;
+	border-bottom: 1px solid var(--dc-border-light, #d4c5a9);
+}
+
+.deadlands-classic .dc-container-table tr:hover {
+	background: rgba(139, 115, 85, 0.1);
+}
+
+.deadlands-classic .dc-container-actions {
+	padding: 8px 0;
+}
+
+/* ─── Boon editor: container_contents field ────────────────────────────── */
+
+.deadlands-classic .container-contents-editor {
+	margin-top: 4px;
+}
+
+.deadlands-classic .container-contents-summary {
+	font-size: 0.85em;
+	color: var(--dc-text-muted, #6b5d4f);
+	margin-bottom: 4px;
+}
+
+.deadlands-classic .container-contents-tree {
+	border: 1px solid var(--dc-border-light, #d4c5a9);
+	border-radius: 3px;
+	padding: 4px;
+	background: rgba(0, 0, 0, 0.02);
+}
+
+.deadlands-classic .container-gm-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 8px;
+}
+
+.deadlands-classic .container-gm-table th {
+	padding: 3px 4px;
+	font-size: 0.85em;
+}
+
+.deadlands-classic .container-gm-table td {
+	padding: 2px 4px;
+}
+
+.deadlands-classic .container-qty-input {
+	width: 3.5em;
+	text-align: center;
+}

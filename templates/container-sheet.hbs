@@ -1,0 +1,34 @@
+<div class="deadlands-sheet newspaper-sheet dc-container flexcol">
+  <div class="center dc-header">{{container_name}}</div>
+
+  {{#if is_empty}}
+  <div class="dc-container-empty center">
+    <p>{{localize "dc.containers.empty"}}</p>
+  </div>
+  {{else}}
+  <div class="scroll">
+    <table class="dc-container-table">
+      <tr>
+        <th class="center width-10">{{localize "dc.containers.qty"}}</th>
+        <th>{{localize "dc.shared.name"}}</th>
+        <th class="right">{{localize "dc.shared.cost"}}</th>
+        <th class="center width-15">{{localize "dc.containers.take"}}</th>
+      </tr>
+      {{#each items as |item|}}
+      <tr>
+        <td class="center">{{item.qty}}</td>
+        <td class="left">{{item.label}}</td>
+        <td class="right">{{item.cost}}</td>
+        <td class="center">
+          {{!-- Phase 3 will add Take button --}}
+        </td>
+      </tr>
+      {{/each}}
+    </table>
+  </div>
+  {{/if}}
+
+  <div class="center dc-container-actions">
+    <button type="button" data-action="close">{{localize "dc.dialog.cancel"}}</button>
+  </div>
+</div>
