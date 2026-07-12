@@ -10,10 +10,16 @@
 import { container } from "../lib/container.js";
 
 export default function open_container_boon(boon, context) {
-	const { region, actor, behavior, behavior_uuid } = context;
+	const { region, actor, target, behavior, behavior_uuid } = context;
 
-	// Determine the container ID from the region behavior UUID
-	const container_id = behavior_uuid || behavior?.uuid || region?.id || actor?.uuid;
+	// Determine a unique container ID.
+	// Region context: behavior UUID (preferred), region ID, or NPC UUID.
+	// Dialog context: no region/behavior — use the NPC (target) UUID.
+	const container_id = behavior_uuid
+		|| behavior?.uuid
+		|| region?.id
+		|| target?.uuid
+		|| actor?.uuid;
 
 	// Persistence check — once_per_player
 	if (boon.persistence === "once_per_player") {

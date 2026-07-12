@@ -17,7 +17,7 @@ const MODULE_ID = "dc-containers";
 // ─── Init: preload templates ──────────────────────────────────────────────
 
 Hooks.once("init", () => {
-	loadTemplates([
+	foundry.applications.handlebars.loadTemplates([
 		"modules/dc-containers/templates/container-sheet.hbs",
 	]);
 });
