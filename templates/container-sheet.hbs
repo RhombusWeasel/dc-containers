@@ -18,9 +18,9 @@
       <tr>
         <td class="center">{{item.qty}}</td>
         <td class="left">{{item.label}}</td>
-        <td class="right">{{item.cost}}</td>
+        <td class="right">{{format_currency item.cost}}</td>
         <td class="center">
-          {{!-- Phase 3 will add Take button --}}
+          <a class="fas fa-hand-paper dc-take-item" data-action="take" data-path="{{item.path}}" title="{{localize "dc.containers.take"}}"></a>
         </td>
       </tr>
       {{/each}}

@@ -28,6 +28,25 @@
 	background: rgba(139, 115, 85, 0.1);
 }
 
+/* Take item button */
+
+.deadlands-classic .dc-container-sheet .dc-take-item {
+	color: var(--dc-text, #4a3728);
+	cursor: pointer;
+	padding: 2px 4px;
+	text-decoration: none;
+}
+
+.deadlands-classic .dc-container-sheet .dc-take-item:hover {
+	color: var(--dc-accent, #8b7355);
+	text-shadow: 0 0 4px rgba(139, 115, 85, 0.4);
+}
+
+.deadlands-classic .dc-container-sheet .dc-take-item.disabled {
+	opacity: 0.35;
+	pointer-events: none;
+}
+
 .deadlands-classic .dc-container-actions {
 	padding: 8px 0;
 }

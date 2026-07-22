@@ -76,7 +76,27 @@ class ContainerSheet extends ScrollPreservationMixin(HandlebarsApplicationMixin(
 		if (action === "close") {
 			this.close();
 		}
-		// Phase 3: handle "take" action
+		if (action === "take") {
+			this._on_take_item(event, target);
+		}
+	}
+
+	_on_take_item(event, target) {
+		const path = target.dataset.path;
+		if (!path) return;
+
+		// Emit socket to GM — GM owns the boon data and must authoritatively
+		// reduce the quantity and re-broadcast the updated contents.
+		game.socket.emit("module.dc-containers", {
+			event: "take_item",
+			container_id: this.container_id,
+			path: path,
+			player_uuid: this._actor?.uuid,
+			player_name: game.user.name,
+		});
+
+		// Optimistically disable the button until the sheet re-renders
+		target.classList.add("disabled");
 	}
 
 	_onRender(context, options) {
