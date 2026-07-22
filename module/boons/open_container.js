@@ -21,12 +21,31 @@ export default function open_container_boon(boon, context) {
 		|| target?.uuid
 		|| actor?.uuid;
 
-	// Persistence check — once_per_player
-	if (boon.persistence === "once_per_player") {
-		if (container.has_player_looted(container_id, actor?.uuid)) {
+	// Persistence check — use system-level boon_persistence API
+	const persistence = boon.persistence || 'once_per_player';
+	if (persistence !== 'none' && persistence !== 'always') {
+		if (game.dc.boon_persistence.has_triggered(container_id, persistence, actor)) {
 			game.dc.msg.announce('Container', 'You have already looted this container.');
 			return;
 		}
+	}
+
+	// Mark as triggered (GM-side via socket for once/once_per_player/once_per_posse)
+	if (persistence === 'once') {
+		game.socket.emit("module.dc-containers", {
+			event: "mark_looted",
+			container_id,
+			disable_behavior_uuid: behavior_uuid,
+			player_uuid: actor?.uuid,
+			persistence,
+		});
+	} else if (persistence === 'once_per_player' || persistence === 'once_per_posse') {
+		game.socket.emit("module.dc-containers", {
+			event: "mark_looted",
+			container_id,
+			player_uuid: actor?.uuid,
+			persistence,
+		});
 	}
 
 	// Build container data from the boon
@@ -34,6 +53,7 @@ export default function open_container_boon(boon, context) {
 		container_name: boon.container_name || 'Container',
 		items: boon.contents || {},
 		loot_mode: false,
+		persistence: boon.persistence || 'once_per_player',
 	};
 
 	container.open_sheet(container_data, container_id, actor);
@@ -66,7 +86,7 @@ function register_boons() {
 			trigger:        { key: 'boon-trigger',        type: 'dropdown',           value: 'trigger',        options: triggers, translation_path: 'dc.triggers', label: 'Trigger' },
 			container_name: { key: 'boon-container_name', type: 'text',              value: 'container_name', label: 'Container Name' },
 			loot_mode:      { key: 'boon-loot_mode',      type: 'checkbox',          value: 'loot_mode',      label: 'Loot Mode (show NPC inventory)' },
-			persistence:    { key: 'boon-persistence',   type: 'dropdown',          value: 'persistence',    options: { once: 'Once', once_per_player: 'Once per Player' }, label: 'Persistence' },
+			persistence:    { key: 'boon-persistence',   type: 'dropdown',          value: 'persistence',    options: { once: 'Once', once_per_player: 'Once per Player', once_per_posse: 'Once per Posse' }, label: 'Persistence' },
 			contents:       { key: 'boon-contents',       type: 'container_contents', value: 'contents',      label: 'Contents' },
 		},
 	});
