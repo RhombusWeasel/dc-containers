@@ -1,8 +1,10 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ApplicationV2 } = foundry.applications.api;
 
+import { normalize_document_data } from "./document_categories.js";
+import { render_newspaper_html } from "./newspaper_render.js";
+
 /**
- * Document Reader Sheet — opens when a player "uses" a document item.
  * Renders content based on the document's content_type:
  *   - ia_book: Internet Archive BookReader embedded via iframe
  *   - url:     Generic URL embedded via iframe
@@ -34,8 +36,13 @@ class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 	 * @param {Actor} actor - The actor who owns this document
 	 */
 	constructor(item, actor) {
-		super({ window: { title: item.label || game.i18n.localize("dc.document.reader_title") } });
-		this.item = foundry.utils.deepClone(item);
+		const is_newspaper = (item.content_type || 'text') === 'newspaper';
+		const position = is_newspaper ? { width: 960, height: 700 } : { width: 800, height: 600 };
+		super({
+			window: { title: item.label || game.i18n.localize("dc.containers.doc.reader_title") },
+			position,
+		});
+		this.item = normalize_document_data(foundry.utils.deepClone(item));
 		this.actor = actor;
 	}
 
@@ -43,15 +50,12 @@ class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 		const context = await super._prepareContext(options);
 		context.item = this.item;
 		context.content_type = this.item.content_type || 'text';
+		context.document_category = this.item.category || '';
 		context.embed_url = this._build_embed_url();
 		context.is_gm = game.user.isGM;
 
-		// For newspaper content, render the structured data through the template at read time
 		if (context.content_type === 'newspaper' && this.item.newspaper_data) {
-			context.newspaper_html = await foundry.applications.handlebars.renderTemplate(
-				"modules/dc-containers/templates/documents/newspaper_sheet.hbs",
-				this.item.newspaper_data,
-			);
+			context.newspaper_html = await render_newspaper_html(this.item.newspaper_data);
 		} else {
 			context.newspaper_html = '';
 		}

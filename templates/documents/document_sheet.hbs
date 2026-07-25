@@ -1,4 +1,4 @@
-<div class="document-reader">
+<div class="document-reader document-reader--{{document_category}} document-reader--type-{{content_type}}">
 	{{#if (eq content_type "ia_book")}}
 		{{#if embed_url}}
 			<iframe src="{{embed_url}}" class="document-iframe" allowfullscreen="true"

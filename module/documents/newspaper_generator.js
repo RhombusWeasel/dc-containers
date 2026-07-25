@@ -276,6 +276,7 @@ const DATA = {
   ],
   market_price_values: ['$2.50', '$5.00', '$12.00', '$25.00', '$50.00', '$1.25', '$3.75', '$8.00', '$15.00', '$30.00'],
   price_numbers: ['2', '3', '4', '5', '8', '12', '15', '20'],
+  paper_prices: ['2¢', '3¢', '5¢', '10¢'],
 
   // --- Social article pools ---
   social_headlines: [
@@ -1043,26 +1044,27 @@ async function build_context(rng, context_type = 'crime', extra = {}) {
  * @param {string} [scope] — 'main' (default) or 'brief'
  * @returns {Object} blueprint object (with _id added)
  */
-function pick_blueprint(rng, scope = 'main') {
-  // 'brief' scope always uses the flavour_brief blueprint for side articles
-  if (scope === 'brief') {
-    return ARTICLE_BLUEPRINTS.flavour_brief
-      ? { id: 'flavour_brief', ...ARTICLE_BLUEPRINTS.flavour_brief }
-      : null;
-  }
-  // 'main' scope picks only from crime-type, non-brief, non-flavour blueprints.
-  // This keeps the main article as a full crime report — other types
-  // (weather, market, social, notice) are kept for future use but not
-  // selected as the lead story.
+function pick_blueprint(rng, scope = 'main', options = {}) {
   const all = { ...ARTICLE_BLUEPRINTS, ..._blueprint_registry };
-  const entries = Object.entries(all).filter(([id, bp]) =>
-    !bp.is_flavour
-    && !id.endsWith('_brief')
-    && bp.context_type === 'crime'
-  );
+
+  if (scope === 'brief') {
+    const entries = Object.entries(all).filter(([id]) => id.endsWith('_brief'));
+    if (entries.length === 0) {
+      return ARTICLE_BLUEPRINTS.flavour_brief
+        ? { id: 'flavour_brief', ...ARTICLE_BLUEPRINTS.flavour_brief }
+        : null;
+    }
+    return pick_weighted(rng, entries.map(([id, bp]) => ({ id, ...bp })));
+  }
+
+  const main_lead = options.main_lead || 'crime';
+  const entries = Object.entries(all).filter(([id, bp]) => {
+    if (bp.is_flavour || id.endsWith('_brief')) return false;
+    if (main_lead === 'any') return true;
+    return bp.context_type === 'crime';
+  });
   if (entries.length === 0) return null;
-  const pool = entries.map(([id, bp]) => ({ id, ...bp }));
-  return pick_weighted(rng, pool);
+  return pick_weighted(rng, entries.map(([id, bp]) => ({ id, ...bp })));
 }
 
 /**
@@ -1085,7 +1087,7 @@ async function generate_article(options = {}) {
   // Resolve blueprint
   let blueprint = options.blueprint_id ? get_blueprint(options.blueprint_id) : null;
   if (!blueprint) {
-    blueprint = pick_blueprint(rng, options.blueprint_scope || 'main');
+    blueprint = pick_blueprint(rng, options.blueprint_scope || 'main', options);
   }
   // Fallback to crime_full if nothing found
   if (!blueprint) blueprint = ARTICLE_BLUEPRINTS.crime_full;
@@ -1223,7 +1225,9 @@ function select_advertisement(rng, filters) {
  * @param {number} [options.columns]        — main article columns: 2 or 3 (default 2)
  * @param {number} [options.side_articles]   — number of flavour briefs to generate (default 4, distributed across both side columns)
  * @param {number} [options.advertisements]  — number of ads: 0, 1, or 2 (default 2)
- * @param {string} [options.main_article_text] — required for 'hybrid' mode (plain text)
+ * @param {string} [options.main_lead]         — 'crime' (default) or 'any' for main article blueprint pool
+ * @param {string} [options.main_article_headline] — hybrid mode headline
+ * @param {string} [options.price]            — cover price (default random from paper_prices)
  * @param {string} [options.seed]           — seed for deterministic output
  * @param {Object} [options.content_filters]  — restrict registered content ({ ids, sources })
  * @returns {Promise<Object>} newspaper data object
@@ -1239,6 +1243,7 @@ async function generate_newspaper(options = {}) {
   const columns = options.columns || 2;
   const side_count = options.side_articles ?? 4;
   const ad_count = options.advertisements ?? 2;
+  const price = options.price || pick(rng, DATA.paper_prices);
   const volume = Math.floor(rng() * 9) + 1;
   const issue = Math.floor(rng() * 52) + 1;
 
@@ -1250,6 +1255,7 @@ async function generate_newspaper(options = {}) {
     return {
       paper_name,
       date,
+      price,
       volume: roman(volume),
       issue,
       columns,
@@ -1262,6 +1268,7 @@ async function generate_newspaper(options = {}) {
       })),
       advertisements: Array.from({ length: ad_count }, (_, i) => ({
         id: `placeholder-${i}`,
+        column: i % 2 === 0 ? 'left' : 'right',
         title: '',
         lines: [],
         note: '',
@@ -1278,17 +1285,20 @@ async function generate_newspaper(options = {}) {
   // Paper-level context passed to all articles (for colophon/paper tokens)
   const paper_ctx = { paper_name, editor_name, next_date };
 
-  if (mode === 'hybrid' && options.main_article_text) {
-    // Hybrid mode: user provided text content for the main article.
-    // Store as plain text paragraphs — no HTML in the data model.
+  if (mode === 'hybrid' && (options.main_article_text || options.main_article_headline)) {
+    const body = options.main_article_text || '';
     main_article = {
-      headline: '',
-      paragraphs: [options.main_article_text],
+      headline: options.main_article_headline || '',
+      paragraphs: body ? body.split(/\n\n+/).filter(p => p.trim()) : [],
       editor: editor_name,
     };
   } else {
-    // Random mode — generate a full procedural article (any blueprint type)
-    const article = await generate_article({ seed: options.seed, blueprint_scope: 'main', extra_ctx: paper_ctx });
+    const article = await generate_article({
+      seed: options.seed,
+      blueprint_scope: 'main',
+      main_lead: options.main_lead,
+      extra_ctx: paper_ctx,
+    });
     main_article = { ...article };
     main_city = article.city;
     main_state = article.state;
@@ -1311,7 +1321,7 @@ async function generate_newspaper(options = {}) {
     const ad = select_advertisement(rng, { ...options.content_filters, exclude_ids: used_ad_ids });
     if (ad) {
       used_ad_ids.add(ad.id);
-      advertisements.push(ad);
+      advertisements.push({ ...ad, column: i % 2 === 0 ? 'left' : 'right' });
     }
   }
 
@@ -1325,6 +1335,7 @@ async function generate_newspaper(options = {}) {
   return {
     paper_name,
     date,
+    price,
     volume: roman(volume),
     issue,
     columns,

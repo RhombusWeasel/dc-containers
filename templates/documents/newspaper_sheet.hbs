@@ -3,25 +3,21 @@
 		<div class="dc-newspaper-name">{{paper_name}}</div>
 		<div class="dc-newspaper-dateline">
 			<span class="dc-newspaper-date">{{date}}</span>
-			<span class="dc-newspaper-price">5¢</span>
+			<span class="dc-newspaper-price">{{#if price}}{{price}}{{else}}5¢{{/if}}</span>
 			<span class="dc-newspaper-edition">Vol. {{volume}}, No. {{issue}}</span>
 		</div>
 	</div>
-	<hr class="dc-newspaper-rule">
+	<hr class="dc-newspaper-rule dc-newspaper-rule--double">
 
-	{{! Main headline — full width }}
 	{{#if main_article.headline}}
 		<h1 class="dc-newspaper-headline">{{main_article.headline}}</h1>
 	{{/if}}
+	<hr class="dc-newspaper-rule">
 
-	{{! Body: 4-column grid
-	     Col 1: ad → flavour briefs (even indices)
-	     Cols 2-3: main article
-	     Col 4: ad → flavour briefs (odd indices) }}
 	<div class="dc-newspaper-body">
 		<div class="dc-newspaper-col dc-newspaper-col-side-left">
 			{{#each advertisements}}
-				{{#if (eq @index 0)}}
+				{{#if (eq this.column "left")}}
 					<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
 						{{#if this.title}}
 							<div class="dc-newspaper-ad-content">
@@ -41,7 +37,7 @@
 			{{/each}}
 
 			{{#each side_articles}}
-				{{#if (eq (mod @index 2) 0)}}
+				{{#if (eq (math @index "%" 2) 0)}}
 					<div class="dc-newspaper-sub-article">
 						{{#if this.headline}}
 							<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
@@ -77,7 +73,7 @@
 
 		<div class="dc-newspaper-col dc-newspaper-col-side-right">
 			{{#each side_articles}}
-				{{#if (eq (mod @index 2) 1)}}
+				{{#if (eq (math @index "%" 2) 1)}}
 					<div class="dc-newspaper-sub-article">
 						{{#if this.headline}}
 							<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
@@ -100,7 +96,7 @@
 			{{/each}}
 
 			{{#each advertisements}}
-				{{#if (eq @index 1)}}
+				{{#if (eq this.column "right")}}
 					<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
 						{{#if this.title}}
 							<div class="dc-newspaper-ad-content">

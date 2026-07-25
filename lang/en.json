@@ -8,6 +8,12 @@
 	"dc.containers.doc": {
 		"reader_title": "Document Reader",
 		"header": "Documents",
+		"add": "Add Document",
+		"hint": [
+			"This is the library, Marshal.  Books, journals, wanted posters, newspapers, maps — anything a player can read, carry, or discover goes here.  Each document is an item that lives in a character's inventory and can be handed out, looted, or found.",
+			"Pick a Category and the reader handles the rest.  Sourcebooks embed Internet Archive books from a details URL.  Web Page embeds any URL in an iframe.  Journals, ledgers, and letters show rich text you write yourself.  Maps and wanted posters display an image path.  Newspapers use the generate button beside Text Content to build a period broadsheet layout.",
+			"And yes, you can put boons on documents.  An ancient tome that requires a Cognition roll to decipher, a cursed journal that deals wind damage when read, a wanted poster with a bounty check — all through the on_use trigger, same as any other item.  The reader opens when the player 'uses' the document, and boons fire at the same time."
+		],
 		"content_type": "Content Type",
 		"content_types": {
 			"ia_book": "Internet Archive Book",
@@ -24,6 +30,7 @@
 			"newspaper": "Newspaper",
 			"map": "Map",
 			"letter": "Letter",
+			"web_page": "Web Page",
 			"other": "Other"
 		},
 		"url": "URL",
@@ -34,6 +41,7 @@
 		"no_image": "No image has been set for this document.",
 		"no_text": "No text content has been written for this document.",
 		"unknown_type": "Unknown document type.",
+		"open_failed": "Failed to open the document reader.",
 		"generate_newspaper": "Generate Newspaper",
 		"generate_newspaper_dialog": "Generate Newspaper Content",
 		"paper_name": "Newspaper Name",
@@ -45,6 +53,16 @@
 		"columns": "Columns",
 		"side_articles": "Side Articles",
 		"advertisements": "Advertisements",
-		"generate_failed": "Failed to generate newspaper content."
+		"generate_failed": "Failed to generate newspaper content.",
+		"seed": "Seed",
+		"seed_placeholder": "(random)",
+		"main_lead": "Main Story",
+		"main_lead_crime": "Crime report",
+		"main_lead_any": "Any topic",
+		"hybrid_headline": "Custom Headline",
+		"hybrid_headline_placeholder": "Hybrid mode only",
+		"hybrid_body": "Custom Body",
+		"hybrid_body_placeholder": "Hybrid mode only — separate paragraphs with blank lines",
+		"newspaper_preview": "Newspaper Preview"
 	}
 }

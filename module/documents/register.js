@@ -5,17 +5,28 @@
  */
 
 import DocumentSheet from "./document_sheet.js";
+import {
+	document_category_options,
+	normalize_document_data,
+} from "./document_categories.js";
 import * as newspaper_generator from "./newspaper_generator.js";
+import { render_newspaper_html } from "./newspaper_render.js";
 
 const MODULE_ID = "dc-containers";
 
 // ─── Use-item handler ─────────────────────────────────────────────────────
 
-function use_handler(actor, path, key, item) {
+async function use_handler(actor, path, key, item) {
 	if (path !== 'char.gear.documents') return;
 	if (!item) return;
-	const sheet = new DocumentSheet(item, actor);
-	sheet.render({ force: true });
+	const doc = normalize_document_data(foundry.utils.deepClone(item));
+	const sheet = new DocumentSheet(doc, actor);
+	try {
+		await sheet.render(true);
+	} catch (err) {
+		console.error('dc-containers | Failed to open document reader:', err);
+		ui.notifications.error(game.i18n.localize('dc.containers.doc.open_failed'));
+	}
 	return sheet;
 }
 
@@ -76,7 +87,7 @@ const document_templates = {
 		newspaper_data: null,
 		image: "",
 		rarity: "common",
-		description: "A periodical or broadsheet. Use the Generate Newspaper button to procedurally generate content, or fill the text content manually.",
+		description: "A periodical or broadsheet. Use the Generate Newspaper button to create procedural layout content stored in newspaper_data.",
 		user_made: false
 	},
 	map_template: {
@@ -100,10 +111,11 @@ const document_templates = {
 /**
  * Open the document reader sheet for an item.
  */
-function open(item, actor) {
+async function open(item, actor) {
 	if (!item) return;
-	const sheet = new DocumentSheet(item, actor);
-	sheet.render({ force: true });
+	const doc = normalize_document_data(foundry.utils.deepClone(item));
+	const sheet = new DocumentSheet(doc, actor);
+	await sheet.render(true);
 	return sheet;
 }
 
@@ -122,7 +134,7 @@ function build_embed_url(url) {
  * Create a document item template with sensible defaults.
  */
 function create_template(category, overrides = {}) {
-	return {
+	return normalize_document_data({
 		label: '',
 		cost: 0,
 		quantity: 1,
@@ -139,12 +151,13 @@ function create_template(category, overrides = {}) {
 		boons: [],
 		count: 0,
 		...overrides,
-	};
+	});
 }
 
 // ─── Schema builder (called lazily on dcReady) ────────────────────────────
 
-function build_editor_schema(categories, rarity_options) {
+function build_editor_schema(rarity_options) {
+	const categories = document_category_options();
 	return {
 		new_object: {
 			label: '',
@@ -165,7 +178,6 @@ function build_editor_schema(categories, rarity_options) {
 		data: {
 			name:          { key: 'label',        type: 'text',      value: 'label',        label: game.i18n.localize("dc.shared.name") },
 			category:      { key: 'category',      type: 'dropdown',  value: 'category',      options: categories, translation_path: 'dc.containers.doc.categories', label: game.i18n.localize("dc.shared.category") },
-			content_type:  { key: 'content_type',  type: 'dropdown',  value: 'content_type',  options: { ia_book: {}, url: {}, text: {}, image: {}, newspaper: {} }, translation_path: 'dc.containers.doc.content_types', label: game.i18n.localize("dc.containers.doc.content_type") },
 			url:           { key: 'url',           type: 'text',      value: 'url',           label: game.i18n.localize("dc.containers.doc.url") },
 			image:         { key: 'image',          type: 'text',      value: 'image',         label: game.i18n.localize("dc.containers.doc.image") },
 			value:         { key: 'cost',           type: 'number',    value: 'cost',           label: game.i18n.localize("dc.shared.cost") },
@@ -175,16 +187,17 @@ function build_editor_schema(categories, rarity_options) {
 			text_content:  { key: 'text_content',   type: 'text_area', value: 'text_content',   label: game.i18n.localize("dc.containers.doc.text_content") },
 			description:   { key: 'description',    type: 'text_area', value: 'description',    label: game.i18n.localize("dc.shared.description") },
 		},
+		func: (form_data) => normalize_document_data(form_data),
 	};
 }
 
-function build_viewer_schema(categories, rarity_options) {
+function build_viewer_schema(rarity_options) {
+	const categories = document_category_options();
 	return {
 		new_object: { label: '', cost: 0, quantity: 1, weight: 1, category: 'sourcebook', content_type: 'ia_book', url: '', text_content: '', newspaper_data: null, image: '', description: '', rarity: 'common', user_made: true, boons: [] },
 		data: {
 			name:          { key: 'label',        type: 'text',      value: 'label',        label: game.i18n.localize("dc.shared.name") },
 			category:      { key: 'category',      type: 'dropdown',  value: 'category',      options: categories, translation_path: 'dc.containers.doc.categories', label: game.i18n.localize("dc.shared.category") },
-			content_type:  { key: 'content_type',  type: 'dropdown',  value: 'content_type',  options: { ia_book: {}, url: {}, text: {}, image: {}, newspaper: {} }, translation_path: 'dc.containers.doc.content_types', label: game.i18n.localize("dc.containers.doc.content_type") },
 			url:           { key: 'url',           type: 'text',      value: 'url',           label: game.i18n.localize("dc.containers.doc.url") },
 			image:         { key: 'image',          type: 'text',      value: 'image',         label: game.i18n.localize("dc.containers.doc.image") },
 			value:         { key: 'cost',           type: 'number',    value: 'cost',           label: game.i18n.localize("dc.shared.cost") },
@@ -197,7 +210,72 @@ function build_viewer_schema(categories, rarity_options) {
 	};
 }
 
+// ─── Gear migration ───────────────────────────────────────────────────────
+
+async function _ensure_gear_documents() {
+	if (!game.user.isGM || !game.dc?.system?.gear) return;
+	if (game.dc.system.gear.documents !== undefined) return;
+	game.dc.system.gear.documents = {};
+	if (game.dc.utils?.update_system) {
+		await game.dc.utils.update_system();
+	}
+}
+
 // ─── Newspaper generation dialog ──────────────────────────────────────────
+
+function _is_documents_editor(editor) {
+	return editor.path === 'gear.documents' || editor.path === 'char.gear.documents';
+}
+
+function _is_newspaper_category(editor, element) {
+	const select = element.querySelector('select.category');
+	const category = select?.value ?? editor.data?.category;
+	return category === 'newspaper';
+}
+
+function _sync_newspaper_generate_button(editor, element) {
+	const text_content_row = element.querySelector('a.editor-edit-textarea[data-key$="text_content"]');
+	if (!text_content_row) return;
+
+	const parent = text_content_row.parentElement;
+	const existing = parent.querySelector('.editor-generate-newspaper');
+
+	if (!_is_newspaper_category(editor, element)) {
+		existing?.remove();
+		return;
+	}
+
+	if (existing) {
+		if (editor.data.newspaper_data) {
+			const preview = parent.querySelector('.textarea-preview');
+			if (preview) {
+				let np = `${editor.data.newspaper_data.paper_name} — ${editor.data.newspaper_data.date}`;
+				if (np.length > 30) np = np.substring(0, 30) + '...';
+				preview.textContent = np;
+			}
+		}
+		return;
+	}
+
+	const btn = document.createElement('a');
+	btn.className = 'fas fa-newspaper editor-generate-newspaper';
+	btn.dataset.key = text_content_row.dataset.key;
+	btn.title = game.i18n.localize('dc.containers.doc.generate_newspaper');
+	btn.addEventListener('click', (event) => {
+		event.stopPropagation();
+		_on_generate_newspaper(editor, btn);
+	});
+	text_content_row.after(btn);
+
+	if (editor.data.newspaper_data) {
+		const preview = parent.querySelector('.textarea-preview');
+		if (preview) {
+			let np = `${editor.data.newspaper_data.paper_name} — ${editor.data.newspaper_data.date}`;
+			if (np.length > 30) np = np.substring(0, 30) + '...';
+			preview.textContent = np;
+		}
+	}
+}
 
 function _on_generate_newspaper(editor, target) {
 	const key = target.dataset.key;
@@ -241,6 +319,25 @@ function _on_generate_newspaper(editor, target) {
 					</select>
 				</div>
 				<div class="flexrow" style="align-items:center;">
+					<label class="dl-label" style="width:120px;" for="np_seed">${game.i18n.localize("dc.containers.doc.seed")}</label>
+					<input type="text" id="np_seed" value="" placeholder="${game.i18n.localize("dc.containers.doc.seed_placeholder")}" style="flex:1;">
+				</div>
+				<div class="flexrow" style="align-items:center;">
+					<label class="dl-label" style="width:120px;" for="np_main_lead">${game.i18n.localize("dc.containers.doc.main_lead")}</label>
+					<select id="np_main_lead" style="flex:1;">
+						<option value="crime">${game.i18n.localize("dc.containers.doc.main_lead_crime")}</option>
+						<option value="any">${game.i18n.localize("dc.containers.doc.main_lead_any")}</option>
+					</select>
+				</div>
+				<div class="flexrow" style="align-items:center;">
+					<label class="dl-label" style="width:120px;" for="np_hybrid_headline">${game.i18n.localize("dc.containers.doc.hybrid_headline")}</label>
+					<input type="text" id="np_hybrid_headline" value="" placeholder="${game.i18n.localize("dc.containers.doc.hybrid_headline_placeholder")}" style="flex:1;">
+				</div>
+				<div class="flexrow" style="align-items:center;">
+					<label class="dl-label" style="width:120px;" for="np_hybrid_body">${game.i18n.localize("dc.containers.doc.hybrid_body")}</label>
+					<textarea id="np_hybrid_body" rows="3" placeholder="${game.i18n.localize("dc.containers.doc.hybrid_body_placeholder")}" style="flex:1;"></textarea>
+				</div>
+				<div class="flexrow" style="align-items:center;">
 					<label class="dl-label" style="width:120px;" for="np_ads">${game.i18n.localize("dc.containers.doc.advertisements")}</label>
 					<select id="np_ads" style="flex:1;">
 						<option value="0">0</option>
@@ -253,6 +350,9 @@ function _on_generate_newspaper(editor, target) {
 	`;
 
 	const callback = async (element) => {
+		const seed_val = element.querySelector('#np_seed')?.value?.trim();
+		const hybrid_headline = element.querySelector('#np_hybrid_headline')?.value?.trim();
+		const hybrid_body = element.querySelector('#np_hybrid_body')?.value?.trim();
 		const opts = {
 			paper_name: element.querySelector('#np_paper_name')?.value || 'The Tombstone Epitaph',
 			mode: element.querySelector('#np_mode')?.value || 'random',
@@ -260,13 +360,18 @@ function _on_generate_newspaper(editor, target) {
 			columns: parseInt(element.querySelector('#np_columns')?.value || '2', 10),
 			side_articles: parseInt(element.querySelector('#np_side_articles')?.value || '4', 10),
 			advertisements: parseInt(element.querySelector('#np_ads')?.value || '2', 10),
+			main_lead: element.querySelector('#np_main_lead')?.value || 'crime',
+			seed: seed_val || undefined,
+			main_article_headline: hybrid_headline || undefined,
+			main_article_text: hybrid_body || undefined,
 		};
 		try {
 			const newspaper_data = await newspaper_generator.generate_newspaper(opts);
 			editor.data.newspaper_data = newspaper_data;
-			editor.data.content_type = 'newspaper';
-			const ct_dropdown = editor.element.querySelector('select.content_type');
-			if (ct_dropdown) ct_dropdown.value = 'newspaper';
+			editor.data.category = 'newspaper';
+			normalize_document_data(editor.data);
+			const category_select = editor.element.querySelector('select.category');
+			if (category_select) category_select.value = 'newspaper';
 			if (hidden_input) hidden_input.value = '';
 			const preview = target.parentElement.querySelector('.textarea-preview');
 			if (preview) {
@@ -297,11 +402,12 @@ export function register_documents() {
 		newspaper_generator.init(generate_random_name);
 	}
 
+	_ensure_gear_documents();
+
 	// Build schemas now that game.i18n and game.dc.system are available
-	const categories = game.dc.system.equipment.categories.documents || {};
 	const rarity_options = game.dc.system.equipment.rarity || {};
-	const editor_schema = build_editor_schema(categories, rarity_options);
-	const viewer_schema = build_viewer_schema(categories, rarity_options);
+	const editor_schema = build_editor_schema(rarity_options);
+	const viewer_schema = build_viewer_schema(rarity_options);
 
 	// Register the gear type (editor + viewer schemas + use handler)
 	game.dc.register_gear_type("documents", {
@@ -329,36 +435,31 @@ export function register_documents() {
 	// Register pre-built document templates
 	game.dc.register_gear_templates("documents", document_templates);
 
-	// Listen for dcUseItem hook to open the document reader
-	Hooks.on("dcUseItem", (actor, path, key, item) => {
-		use_handler(actor, path, key, item);
+	Hooks.on("dcItemViewerPrepareContext", async (viewer, context) => {
+		if (context.item_type !== 'documents') return;
+		if (context.data?.content_type !== 'newspaper' || !context.data?.newspaper_data) return;
+		context.newspaper_html = await render_newspaper_html(context.data.newspaper_data);
 	});
 
 	// Listen for editor render to inject the newspaper generate button
 	Hooks.on("dcEditorRender", (editor, element) => {
-		if (editor.path !== 'gear.documents') return;
-		if (editor.data?.category !== 'newspaper') return;
-		const text_content_row = element.querySelector('a.editor-edit-textarea[data-key$="text_content"]');
-		if (!text_content_row) return;
-		if (text_content_row.parentElement.querySelector('.editor-generate-newspaper')) return; // already added
-		const btn = document.createElement('a');
-		btn.className = 'fas fa-newspaper editor-generate-newspaper';
-		btn.dataset.key = text_content_row.dataset.key;
-		btn.title = game.i18n.localize('dc.containers.doc.generate_newspaper');
-		btn.addEventListener('click', (event) => {
-			event.stopPropagation();
-			_on_generate_newspaper(editor, btn);
-		});
-		text_content_row.after(btn);
-		// If newspaper_data exists, update the preview
-		if (editor.data.newspaper_data) {
-			const preview = text_content_row.parentElement.querySelector('.textarea-preview');
-			if (preview) {
-				let np = `${editor.data.newspaper_data.paper_name} — ${editor.data.newspaper_data.date}`;
-				if (np.length > 30) np = np.substring(0, 30) + '...';
-				preview.textContent = np;
-			}
+		if (!_is_documents_editor(editor)) return;
+
+		normalize_document_data(editor.data);
+		_sync_newspaper_generate_button(editor, element);
+
+		const category_select = element.querySelector('select.category');
+		if (!category_select) return;
+
+		if (editor._bound_newspaper_category_change) {
+			category_select.removeEventListener('change', editor._bound_newspaper_category_change);
 		}
+		editor._bound_newspaper_category_change = () => {
+			editor._sync_form_to_data();
+			normalize_document_data(editor.data);
+			_sync_newspaper_generate_button(editor, element);
+		};
+		category_select.addEventListener('change', editor._bound_newspaper_category_change);
 	});
 
 	// Expose document API on the module
@@ -369,6 +470,7 @@ export function register_documents() {
 			open,
 			build_embed_url,
 			create_template,
+			render_newspaper_html,
 			generate_newspaper: newspaper_generator.generate_newspaper,
 			generate_article: newspaper_generator.generate_article,
 			register_newspaper_content: newspaper_generator.register_newspaper_content,
