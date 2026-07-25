@@ -24,6 +24,12 @@
 				<p>{{localize "dc.containers.doc.no_url"}}</p>
 			</div>
 		{{/if}}
+	{{else if document_html}}
+		<div class="document-text-container scroll-container">
+			<div class="document-text scroll" data-scroll-id="document-text">
+				{{{document_html}}}
+			</div>
+		</div>
 	{{else if (eq content_type "image")}}
 		<div class="document-image-container">
 			{{#if item.image}}
@@ -43,19 +49,6 @@
 				{{else}}
 					<div class="document-placeholder">
 						<i class="fas fa-file-lines"></i>
-						<p>{{localize "dc.containers.doc.no_text"}}</p>
-					</div>
-				{{/if}}
-			</div>
-		</div>
-	{{else if (eq content_type "newspaper")}}
-		<div class="document-text-container scroll-container">
-			<div class="document-text scroll" data-scroll-id="document-text">
-				{{#if newspaper_html}}
-					{{{newspaper_html}}}
-				{{else}}
-					<div class="document-placeholder">
-						<i class="fas fa-newspaper"></i>
 						<p>{{localize "dc.containers.doc.no_text"}}</p>
 					</div>
 				{{/if}}

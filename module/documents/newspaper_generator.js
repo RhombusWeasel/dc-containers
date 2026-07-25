@@ -12,6 +12,33 @@
  *   - list_newspaper_content(type)
  */
 
+import { BUILTIN_ADS, select_advertisement } from './newspaper_ads.js';
+import {
+  calculate_slots_per_column,
+  pack_column_slots,
+  fill_empty_slots,
+  build_scaffold_layout,
+  split_into_fragments,
+  collect_main_paragraphs,
+} from './newspaper_layout.js';
+import {
+  get_effective_pool,
+  register_pool_sources,
+} from './newspaper_pool_overrides.js';
+import {
+  register_value_list_sources,
+  get_effective_value_list,
+  get_effective_crime_list,
+  get_effective_states,
+  get_effective_cities,
+  list_all_territories,
+} from './newspaper_value_lists.js';
+
+function pick_vl(rng, key) {
+  const pool = get_effective_value_list(key);
+  return pool.length ? pick(rng, pool) : '';
+}
+
 // ---------------------------------------------------------------------------
 // Seeded RNG (mulberry32) — deterministic when a seed is provided
 // ---------------------------------------------------------------------------
@@ -85,37 +112,37 @@ const DATA = {
   ],
   starts: [
     // Original templates
-    'A {{dastardly}} gang of {{number}} {{culprit.pronoun.group}}, led by {{culprit.name.full}} ({{age}}), were {{captured}} {{crime.article}} in {{city}}, {{state}} last week. {{plea_for_order}}',
-    'Reports coming in from {{city}}, {{state}} confirm one {{culprit.name.full}} ({{age}}), and {{culprit.pronoun.clause}} {{number_sub_1}} accomplices were sentenced to {{sentence.text}} for {{crime.article}} last week. {{plea_for_order}}',
-    'Local {{culprit.pronoun.singular}} {{culprit.name.full}} ({{age}}) was shot dead today whilst {{crime.article}}. {{plea_for_order}}',
-    'It seems that the crime epidemic in {{city}}, {{state}} has reached new heights with another {{culprit.pronoun.singular}}, a {{culprit.name.full}} ({{age}}) being sentenced to {{sentence.text}} for {{crime.article}}! {{plea_for_order}}',
-    'Local {{witness.profession}} {{culprit.name.full}} ({{age}}) went on an unexpected crime spree last month. {{culprit.name.formal}} was first seen {{crime.article}} after which witnesses report {{culprit.pronoun.subjective}} {{random.crime}} before finally being apprehended attempting to ransom back a {{random.building}} that {{culprit.pronoun.objective}} had occupied by force back to the state of {{state}}.',
+    'A {{dastardly}} gang of {{number}} {{culprit.pronoun.group}}, led by {{culprit.name.full}} ({{culprit.age}}), were {{captured}} {{crime.article}} in {{city}}, {{state}} last week. {{plea_for_order}}',
+    'Reports coming in from {{city}}, {{state}} confirm one {{culprit.name.full}} ({{culprit.age}}), and {{culprit.pronoun.clause}} {{number.sub_1}} accomplices were sentenced to {{sentence.text}} for {{crime.article}} last week. {{plea_for_order}}',
+    'Local {{culprit.pronoun.singular}} {{culprit.name.full}} ({{culprit.age}}) was shot dead today whilst {{crime.article}}. {{plea_for_order}}',
+    'It seems that the crime epidemic in {{city}}, {{state}} has reached new heights with another {{culprit.pronoun.singular}}, a {{culprit.name.full}} ({{culprit.age}}) being sentenced to {{sentence.text}} for {{crime.article}}! {{plea_for_order}}',
+    'Local {{witness.profession}} {{culprit.name.full}} ({{culprit.age}}) went on an unexpected crime spree last month. {{culprit.name.formal}} was first seen {{crime.article}} after which witnesses report {{culprit.pronoun.subjective}} {{random.crime}} before finally being apprehended attempting to ransom back a {{random.building}} that {{culprit.pronoun.subjective}} had occupied by force back to the state of {{state}}.',
     // New templates — expanded pool for flavour briefs
-    'The quiet town of {{city}}, {{state}} was rocked by scandal this week when {{culprit.name.full}} ({{age}}), a respected {{witness.profession}}, was discovered to be running a {{subject.contraband}} smuggling ring out of the {{subject.building}} basement.',
+    'The quiet town of {{city}}, {{state}} was rocked by scandal this week when {{culprit.name.full}} ({{culprit.age}}), a respected {{witness.profession}}, was discovered to be running a {{subject.contraband}} smuggling ring out of the {{subject.building}} basement.',
     'Strange doings in {{city}}, {{state}}, where {{number}} head of cattle were found dead in a field outside town, each one drained entirely of blood. Sheriff\'s deputies are baffled and locals are whispering about {{spooky_possession}}.',
     'A {{dastardly}} gang calling themselves "The {{city}} {{random.animal}}s" has been terrorizing merchants along the {{state}} toll road, {{crime.article}} and leaving nothing but empty whiskey bottles in their wake.',
     '{{officer.rank}} {{officer.name.full}} arrived in {{city}} this week on the trail of {{culprit.name.formal}}, wanted in {{territory}} for {{crime.article}}. "We\'ve been on {{culprit.pronoun.clause}} trail for {{number}} weeks now," the {{officer.rank}} told our reporter.',
-    'The {{subject.building}} on Main Street in {{city}}, {{state}} was badly damaged last night in what authorities are calling an act of {{dastardly}} vandalism. {{culprit.name.full}} ({{age}}) was taken into custody at the scene.',
+    'The {{subject.building}} on Main Street in {{city}}, {{state}} was badly damaged last night in what authorities are calling an act of {{dastardly}} vandalism. {{culprit.name.full}} ({{culprit.age}}) was taken into custody at the scene.',
     'A mysterious stranger known only as "{{culprit.name.first}}" rode into {{city}} last Tuesday and hasn\'t been seen since. {{culprit.pronoun.subjective}} was last headed toward the {{subject.building}}, carrying a suspiciously large sack and humming a strange tune.',
     'The {{city}} bank was robbed in broad daylight by a lone {{culprit.pronoun.singular}} wearing a {{random.colour}} bandana. {{officer.rank}} {{officer.name.last}} says this is the {{number}} bank robbery in {{state}} this month.',
-    'Deputies in {{state}} are searching for {{culprit.name.full}} ({{age}}), who escaped custody while being transported to the territorial prison. {{culprit.name.formal}} was last seen heading toward {{city}} on a stolen {{subject.animal}}.',
+    'Deputies in {{state}} are searching for {{culprit.name.full}} ({{culprit.age}}), who escaped custody while being transported to the territorial prison. {{culprit.name.formal}} was last seen heading toward {{city}} on a stolen {{subject.animal}}.',
     'A {{dastardly}} scheme involving forged deeds to {{subject.building}}s across {{state}} has been uncovered. The alleged ringleader, {{culprit.name.full}}, is said to have swindled {{number}} families out of their properties using forged documents.',
     'Fire broke out at the {{subject.building}} in {{city}} late Wednesday evening. Though flames were quickly contained, the blaze is being treated as suspicious. A {{culprit.pronoun.singular}} matching {{culprit.name.formal}}\'s description was seen fleeing the scene.',
-    'An outbreak of {{crime.headline}} has the citizens of {{city}}, {{state}} at their wits\' end. "I\'ve lived here {{age}} years and never seen anything like it," said one resident who declined to give {{culprit.pronoun.clause}} name.',
+    'An outbreak of {{crime.headline}} has the citizens of {{city}}, {{state}} at their wits\' end. "I\'ve lived here all my life and never seen anything like it," said one resident who declined to give their name.',
     'The body of an unidentified {{culprit.pronoun.singular}} was found behind the {{subject.building}} in {{city}} yesterday morning. {{officer.rank}} {{officer.name.full}} says foul play is suspected and an inquest will be held.',
     '{{culprit.name.full}}, known to locals in {{city}} as "{{dastardly}} {{culprit.name.last}}", was finally run to ground by {{officer.rank}} {{officer.name.full}} after a {{number}}-day pursuit across {{state}}.',
-    'A traveling salesman, {{culprit.name.full}} ({{age}}), was arrested in {{city}} after attempting to sell what turned out to be {{subject.contraband}} disguised as {{subject.product}}s. "The fake mustache was a dead giveaway," said arresting {{officer.rank}} {{officer.name.last}}.',
+    'A traveling salesman, {{culprit.name.full}} ({{culprit.age}}), was arrested in {{city}} after attempting to sell what turned out to be {{subject.contraband}} disguised as {{subject.product}}s. "The fake mustache was a dead giveaway," said arresting {{officer.rank}} {{officer.name.last}}.',
     'The good people of {{city}}, {{state}} are on edge after {{number}} graves were found disturbed in the cemetery. {{officer.rank}} {{officer.name.full}} declined to speculate on whether the perpetrator is human or something altogether more {{dastardly}}.',
   ],
   witness_reports: [
-    'One eye witness, {{witness.name.full}} ({{age}}), a local contrarian, was quoted to say "The {{subject.animal}}\'s did it! I seen \'em doin\' it! Them and the {{random.animal}}\'s — this goes all the way to the top, man! Even the {{random.animal}}\'s are in on it!" However {{witness.name.formal}} is believed, at least by this reporter, to be insane. I think it might be high time to investigate just exactly why so many people I interview are certifiably insane.',
+    'One eye witness, {{witness.name.full}} ({{witness.age}}), a local contrarian, was quoted to say "The {{subject.animal}}\'s did it! I seen \'em doin\' it! Them and the {{random.animal}}\'s — this goes all the way to the top, man! Even the {{random.animal}}\'s are in on it!" However {{witness.name.formal}} is believed, at least by this reporter, to be insane. I think it might be high time to investigate just exactly why so many people I interview are certifiably insane.',
     'One witness who wishes to remain anonymous reported "Look, I know this sounds crazy but {{spooky_possession}}." Another, also not willing to put their name to an outright fabrication, said "{{spooky_possession}} — I know how crazy that sounds but it\'s what I saw!" I mean come on now, {{spooky_possession}}! Like we were all born yesterday. P.T. Barnum has a point — there is a sucker born every minute and I\'m afraid it\'s you this minute, dear reader, if you believe that nonsense!',
-    'Local {{subject.product}} merchant {{witness.name.full}} ({{age}}) was willing to go on record stating: "You lookin\' to buy a {{subject.product}}? Come on down and see me at Crazy {{witness.name.first}}\'s {{subject.product}} Emporium! I got big {{subject.product}}\'s, I got small {{subject.product}}\'s, hell I\'ve even got {{random.colour}} {{subject.product}}\'s and I will not be beaten on price! What\'re you talkin\' about {{crime.headline}} son? Can\'t you see I\'m trying to work here!"',
+    'Local {{subject.product}} merchant {{witness.name.full}} ({{witness.age}}) was willing to go on record stating: "You lookin\' to buy a {{subject.product}}? Come on down and see me at Crazy {{witness.name.first}}\'s {{subject.product}} Emporium! I got big {{subject.product}}\'s, I got small {{subject.product}}\'s, hell I\'ve even got {{random.colour}} {{subject.product}}\'s and I will not be beaten on price! What\'re you talkin\' about {{crime.headline}} son? Can\'t you see I\'m trying to work here!"',
   ],
   officer_statements: [
-    'The arresting officer {{officer.name.full}} ({{age}}) gave a statement saying "{{crime.article}} is no joke in {{state}}. If you are a fugitive from the law like {{culprit.name.formal}} here, let me tell you right now — the {{officer.rank}}\'s of {{state}} are vigilant. We will find you."',
-    '{{officer.name.full}} ({{age}}) gave a short response via telegram saying {{officer.pronoun.objective}} expects all {{number}} to receive the maximum penalty in {{state}}: {{sentence.text}}. The governor was unavailable for comment but one aide said "{{reporter_insult}}"',
-    '{{officer.name.full}} ({{age}}) the arresting officer had this to say: "{{culprit.name.formal}} is related to a local {{subject.product}} magnate and I think this is just a case of {{culprit.pronoun.child}}\'s being {{culprit.pronoun.child}}\'s. I\'d also like to address the {{dastardly}} rumours going around about corruption in the {{city}} police department — these lies are unfounded and frankly it\'s counterfeit news."',
+    'The arresting officer {{officer.name.full}} ({{officer.age}}) gave a statement saying "{{crime.article}} is no joke in {{state}}. If you are a fugitive from the law like {{culprit.name.formal}} here, let me tell you right now — the {{officer.rank}}\'s of {{state}} are vigilant. We will find you."',
+    '{{officer.name.full}} ({{officer.age}}) gave a short response via telegram saying {{officer.pronoun.subjective}} expects all {{number}} to receive the maximum penalty in {{state}}: {{sentence.text}}. The governor was unavailable for comment but one aide said "{{reporter_insult}}"',
+    '{{officer.name.full}} ({{officer.age}}) the arresting officer had this to say: "{{culprit.name.formal}} is related to a local {{subject.product}} magnate and I think this is just a case of {{culprit.pronoun.child}}\'s being {{culprit.pronoun.child}}\'s. I\'d also like to address the {{dastardly}} rumours going around about corruption in the {{city}} police department — these lies are unfounded and frankly it\'s counterfeit news."',
   ],
   pleas_for_order: [
     'Now I know the good people of {{city}} will agree that this just can\'t stand. We need to wake up to this {{crime.headline}} epidemic that\'s sweeping across our fine nation and we need to act fast.',
@@ -163,7 +190,7 @@ const DATA = {
   ],
   spooky_possessions: [
     'some kind of bug took over {{culprit.pronoun.clause}} mind',
-    'demons possessed {{culprit.pronoun.subjective}}',
+    'demons possessed {{culprit.pronoun.objective}}',
     'something sticky and glowing {{random.colour}} was dripping out {{culprit.pronoun.clause}} eyes the whole time',
     'a ghost walked right through {{culprit.pronoun.objective}} and stole {{culprit.pronoun.clause}} shadow',
   ],
@@ -206,28 +233,46 @@ const DATA = {
     'The Curious Case of {{culprit.name.formal}}',
     'Terror on the {{state}} Road',
     '{{city}} Cattle Deaths Deepen',
+    'Agency Probe in {{city}}',
+    'Wasatch Train Incident',
+    'Ghost Rock Theft in {{state}}',
+    'Lost Angels Charity Under Scrutiny',
+    'Smith & Robards Recall?',
+    'Sioux Boundary Dispute',
+    'Pinkerton Inquiry in {{city}}',
+    'Union Blue Derailment',
+    'Black River Freight Seized',
   ],
   flavour_starts: [
-    'A {{dastardly}} gang of {{number}} {{culprit.pronoun.group}}, led by {{culprit.name.full}} ({{age}}), were {{captured}} {{crime.article}} in {{city}}, {{state}} last week.',
-    'Reports coming in from {{city}}, {{state}} confirm one {{culprit.name.full}} ({{age}}), and {{culprit.pronoun.clause}} {{number_sub_1}} accomplices were sentenced to {{sentence.text}} for {{crime.article}}.',
-    'Local {{culprit.pronoun.singular}} {{culprit.name.full}} ({{age}}) was shot dead today whilst {{crime.article}}.',
-    'The quiet town of {{city}}, {{state}} was rocked by scandal this week when {{culprit.name.full}} ({{age}}) was discovered to be running a {{subject.contraband}} smuggling ring.',
+    'A {{dastardly}} gang of {{number}} {{culprit.pronoun.group}}, led by {{culprit.name.full}} ({{culprit.age}}), were {{captured}} {{crime.article}} in {{city}}, {{state}} last week.',
+    'Reports coming in from {{city}}, {{state}} confirm one {{culprit.name.full}} ({{culprit.age}}), and {{culprit.pronoun.clause}} {{number.sub_1}} accomplices were sentenced to {{sentence.text}} for {{crime.article}}.',
+    'Local {{culprit.pronoun.singular}} {{culprit.name.full}} ({{culprit.age}}) was shot dead today whilst {{crime.article}}.',
+    'The quiet town of {{city}}, {{state}} was rocked by scandal this week when {{culprit.name.full}} ({{culprit.age}}) was discovered to be running a {{subject.contraband}} smuggling ring.',
     'Strange doings in {{city}}, {{state}}, where {{number}} head of cattle were found dead in a field, each drained entirely of blood.',
     'A {{dastardly}} gang calling themselves "The {{city}} {{random.animal}}s" has been terrorizing merchants along the {{state}} toll road.',
     '{{officer.rank}} {{officer.name.full}} arrived in {{city}} this week on the trail of {{culprit.name.formal}}, wanted in {{territory}} for {{crime.article}}.',
     'The {{subject.building}} on Main Street in {{city}}, {{state}} was badly damaged last night in what authorities are calling an act of {{dastardly}} vandalism.',
     'A mysterious stranger known only as "{{culprit.name.first}}" rode into {{city}} last Tuesday and hasn\'t been seen since.',
     'The {{city}} bank was robbed in broad daylight by a lone {{culprit.pronoun.singular}} wearing a {{random.colour}} bandana.',
-    'Deputies in {{state}} are searching for {{culprit.name.full}} ({{age}}), who escaped custody while being transported to the territorial prison.',
+    'Deputies in {{state}} are searching for {{culprit.name.full}} ({{culprit.age}}), who escaped custody while being transported to the territorial prison.',
     'Fire broke out at the {{subject.building}} in {{city}} late Wednesday evening. The blaze is being treated as suspicious.',
     'An outbreak of {{crime.headline}} has the citizens of {{city}}, {{state}} at their wits\' end.',
     'The body of an unidentified {{culprit.pronoun.singular}} was found behind the {{subject.building}} in {{city}} yesterday morning.',
     '{{culprit.name.full}}, known to locals as "{{dastardly}} {{culprit.name.last}}", was finally run to ground after a {{number}}-day pursuit across {{state}}.',
-    'A traveling salesman, {{culprit.name.full}} ({{age}}), was arrested in {{city}} after attempting to sell {{subject.contraband}} disguised as {{subject.product}}s.',
+    'A traveling salesman, {{culprit.name.full}} ({{culprit.age}}), was arrested in {{city}} after attempting to sell {{subject.contraband}} disguised as {{subject.product}}s.',
     'The good people of {{city}}, {{state}} are on edge after {{number}} graves were found disturbed in the cemetery.',
     'A peculiar green fog has settled over {{city}}, {{state}}, and several residents report hearing strange whispers in the night.',
     'The stage from {{city}} to {{state}} was held up by armed men yesterday. Passengers were relieved of their valuables but none were seriously harmed.',
     'Old prospectors returning from the hills above {{city}} speak of strange lights in the sky and cattle vanishing without trace.',
+    'Agents of the Federal Bureau arrived in {{city}} yesterday to investigate reports of unnatural creatures stalking the outskirts.',
+    'A Wasatch Railroad express derailed outside {{city}}, {{state}} last night — witnesses describe green flames and clockwork debris scattered along the track.',
+    'Thieves made off with a shipment of ghost rock bound for the refinery, leaving {{number}} guards dead and no trace of the wagon.',
+    'Questions surround a charity drive organised by missionaries from Lost Angels, after ledgers showed funds never reached the poor of {{city}}.',
+    'Smith & Robards has issued a recall on a popular pocket gadget after several exploded in the hands of customers in {{state}}.',
+    'Sioux warriors were seen patrolling the boundary east of {{city}}, warning settlers that treaty lands have been crossed again.',
+    'Pinkerton detectives questioned half the merchants on Main Street regarding a missing payroll from the Union Blue depot.',
+    'Rail barons are feuding again — Black River freight agents seized a Union Blue car on disputed sidings near {{city}}.',
+    'Texas Rangers rode through {{city}} at dawn, hunting a reckoners\' associate wanted for shootings in three territories.',
   ],
 
   // --- Weather article pools ---
@@ -328,7 +373,167 @@ const DATA = {
     'Continued on page {{continued_page}}, column {{continued_column}}',
     'For the complete story, see page {{continued_page}}',
   ],
+
+  // --- Main-article fragment pools (2–4 sentences each; start / middle / end) ---
+  main_fragments_starts: [
+    'A {{dastardly}} gang led by {{culprit.name.full}} ({{culprit.age}}) were {{captured}} {{crime.article}} in {{city}}, {{state}} last week. {{officer.rank}} {{officer.name.last}} says the investigation is ongoing and more arrests may follow.',
+    'Reports from {{city}}, {{state}} confirm {{culprit.name.full}} ({{culprit.age}}) was sentenced to {{sentence.text}} for {{crime.article}}. The courtroom was packed with townsfolk eager to see justice done.',
+    'Local {{culprit.pronoun.singular}} {{culprit.name.full}} ({{culprit.age}}) was shot dead whilst {{crime.article}} in {{city}}. {{officer.rank}} {{officer.name.full}} arrived on the scene within the hour and cordoned off the area.',
+    'The crime wave in {{city}}, {{state}} worsened when {{culprit.name.full}} ({{culprit.age}}) received {{sentence.text}} for {{crime.article}}. Merchants on Main Street report trade has suffered as nervous customers stay home.',
+    '{{officer.rank}} {{officer.name.full}} arrived in {{city}} on the trail of {{culprit.name.formal}}, wanted for {{crime.article}}. "We\'ve been on {{culprit.pronoun.clause}} trail for {{number}} weeks now," the {{officer.rank}} told our reporter.',
+    'The {{subject.building}} on Main Street in {{city}} was damaged in an act of {{dastardly}} vandalism. {{culprit.name.full}} ({{culprit.age}}) was taken into custody at the scene after a brief struggle with deputies.',
+    'The {{city}} bank was robbed in broad daylight by a {{culprit.pronoun.singular}} wearing a {{random.colour}} bandana. {{officer.rank}} {{officer.name.last}} says this is the {{number}} bank robbery in {{state}} this month alone.',
+    'Deputies in {{state}} are searching for {{culprit.name.full}} ({{culprit.age}}), who escaped while being transported to prison. {{culprit.name.formal}} was last seen heading toward {{city}} on a stolen {{subject.animal}}.',
+    'Fire broke out at the {{subject.building}} in {{city}} late Wednesday. A {{culprit.pronoun.singular}} matching {{culprit.name.formal}}\'s description fled the scene, though flames were quickly contained.',
+    'The body of an unidentified {{culprit.pronoun.singular}} was found behind the {{subject.building}} in {{city}} yesterday morning. {{officer.rank}} {{officer.name.full}} says foul play is suspected and an inquest will be held.',
+    '{{culprit.name.full}}, known locally as "{{dastardly}} {{culprit.name.last}}", was run to ground after a {{number}}-day pursuit across {{state}}. {{officer.rank}} {{officer.name.full}} personally led the posse that finally cornered the fugitive.',
+    'A traveling salesman, {{culprit.name.full}} ({{culprit.age}}), was arrested in {{city}} for selling {{subject.contraband}} disguised as {{subject.product}}s. "The fake mustache was a dead giveaway," said arresting {{officer.rank}} {{officer.name.last}}.',
+    'Strange doings in {{city}}, {{state}}, where {{number}} head of cattle were found dead, each drained of blood. Sheriff\'s deputies are baffled and locals are whispering about {{spooky_possession}}.',
+    'A {{dastardly}} scheme involving forged deeds to {{subject.building}}s across {{state}} has been uncovered. The alleged ringleader, {{culprit.name.full}}, is said to have swindled {{number}} families out of their properties.',
+    'An outbreak of {{crime.headline}} has the citizens of {{city}}, {{state}} at their wits\' end. "I\'ve lived here all my life and never seen anything like it," said one resident who declined to give their name.',
+    'The quiet town of {{city}} was rocked when {{culprit.name.full}} ({{culprit.age}}) was discovered running a {{subject.contraband}} smuggling ring out of the {{subject.building}} basement. A respected {{witness.profession}} was among those taken into custody.',
+    'A gang calling themselves "The {{city}} {{random.animal}}s" has been {{crime.article}} along the {{state}} toll road, leaving nothing but empty whiskey bottles in their wake. Merchants are demanding action from the territorial authorities.',
+    'A mysterious stranger known as "{{culprit.name.first}}" rode into {{city}} Tuesday carrying a suspiciously large sack. {{culprit.pronoun.subjective}} was last headed toward the {{subject.building}}, humming a strange tune.',
+    'The good people of {{city}} are on edge after {{number}} graves were found disturbed in the cemetery. {{officer.rank}} {{officer.name.full}} declined to speculate on whether the perpetrator is human or something altogether more {{dastardly}}.',
+    'Old prospectors above {{city}} speak of strange lights and cattle vanishing without trace. Agents of the Federal Bureau arrived yesterday to investigate reports of unnatural creatures stalking the outskirts.',
+  ],
+  main_fragments_witness: [
+    'Witness {{witness.name.full}} ({{witness.age}}) claimed "{{spooky_possession}}." This reporter finds the account doubtful, though {{witness.name.formal}} seemed entirely sincere at the time of our interview.',
+    'One witness who declined to be named insisted "{{spooky_possession}}." Make of that what you will, dear reader — I for one remain unconvinced by such fanciful testimony.',
+    'Local {{subject.product}} merchant {{witness.name.full}} refused to comment on the affair, citing business. "Can\'t you see I\'m trying to work here?" {{witness.pronoun.subjective}} told our correspondent before slamming the door.',
+    'A passer-by reported hearing shots near the {{subject.building}} shortly before dawn. "It sounded like a whole war breaking out," said the witness, who asked to remain anonymous for fear of reprisal.',
+    '{{witness.name.formal}}, a {{witness.profession}}, told our correspondent the town "has never seen the like." {{witness.pronoun.subjective}} has lived in {{city}} for {{witness.age}} years and claims nothing comparable has occurred in living memory.',
+    'One eye witness, {{witness.name.full}} ({{witness.age}}), a local contrarian, was quoted to say "The {{subject.animal}}\'s did it! I seen \'em doin\' it!" However {{witness.name.formal}} is believed, at least by this reporter, to be insane.',
+    'A witness who wishes to remain anonymous reported "Look, I know this sounds crazy but {{spooky_possession}}." Another, also unwilling to put their name to an outright fabrication, corroborated the account with equal fervour.',
+    '{{witness.name.full}} ({{witness.age}}), proprietor of a {{subject.product}} stall on Main Street, witnessed the entire affair from {{witness.pronoun.clause}} shop window. "I didn\'t see nothing and I ain\'t saying nothing," {{witness.pronoun.subjective}} declared.',
+    'Several bystanders near the {{subject.building}} gave conflicting accounts of the events. One insisted {{culprit.name.formal}} acted alone; another swore there were at least {{number}} accomplices waiting in the alley.',
+    'Old {{witness.name.first}}, the town\'s most reliable gossip, claims to have seen everything from {{witness.pronoun.clause}} porch. Our correspondent notes that {{witness.name.formal}} also claimed to have seen a {{random.animal}} piloting a steamwagon last month.',
+  ],
+  main_fragments_officer: [
+    '{{officer.rank}} {{officer.name.full}} stated "{{crime.article}} is no joke in {{state}}. We will find fugitives like {{culprit.name.formal}}." The {{officer.rank}} declined further comment but promised a full report within the week.',
+    '{{officer.name.full}} ({{officer.age}}) expects all involved to receive {{sentence.text}} in {{state}}. The governor was unavailable for comment but one aide told our reporter to "{{reporter_insult}}."',
+    '{{officer.name.full}} dismissed rumours of corruption in the {{city}} police department as "counterfeit news." {{officer.pronoun.subjective}} would not address allegations that {{culprit.name.formal}} is related to a local {{subject.product}} magnate.',
+    'The arresting {{officer.rank}} said {{culprit.name.formal}} would face the full weight of territorial law. "If you are a fugitive from the law like {{culprit.name.formal}} here, let me tell you — the {{officer.rank}}\'s of {{state}} are vigilant."',
+    '{{officer.rank}} {{officer.name.last}} confirmed an inquest will be held within the week. {{officer.pronoun.subjective}} expects the proceedings to draw considerable interest from neighbouring counties.',
+    '{{officer.name.full}} ({{officer.age}}) gave a short response via telegram saying {{officer.pronoun.subjective}} expects all {{number}} accomplices to receive the maximum penalty: {{sentence.text}}. No further statement is anticipated.',
+    'The arresting officer {{officer.name.full}} ({{officer.age}}) told our correspondent that {{culprit.name.formal}} offered no resistance once cornered. "I think this is just a case of {{culprit.pronoun.child}}\'s being {{culprit.pronoun.child}}\'s," {{officer.pronoun.subjective}} added.',
+    '{{officer.rank}} {{officer.name.full}} arrived in {{city}} this week specifically to investigate the affair. "We\'ve had enough of this {{crime.headline}} nonsense in {{state}}," {{officer.pronoun.subjective}} declared at a town meeting.',
+  ],
+  main_fragments_plea: [
+    'The good people of {{city}} must stand together against this {{crime.headline}} epidemic sweeping {{state}}. We need to wake up to the danger before it is too late for our fine community.',
+    'What has become of common decency? We need to return to family values before {{city}} is lost entirely. If it\'s not {{crime.article}} then it\'s another heinous act — something must change.',
+    'Let us add {{city}} to our collective prayers and support the charities aiding victims in {{state}}. I for one will be donating to all the various charities that spring from this tragic event.',
+    'This editor urges every citizen of {{state}} to remain vigilant and report suspicious activity at once. Together we can restore peace to {{city}} and hold the guilty to account.',
+  ],
+  main_fragments_weather_start: [
+    'Residents of {{city}}, {{state}} awoke to {{weather.condition}} this morning, with temperatures hovering near {{weather.temperature}}. Main Street was nearly deserted as sensible folk stayed indoors.',
+    'The {{weather.condition}} that swept through {{city}} last night has left locals scratching their heads. Old-timers say they haven\'t seen the like since \'{{weather.year}}.',
+    'A fierce {{weather.condition}} struck {{city}}, {{state}} yesterday, damaging {{weather.damage}} and frightening {{weather.livestock}}. The telegraph lines are down and news travels slowly.',
+    'Strange skies over {{city}} have set tongues wagging throughout {{state}}. {{weather.condition}} rolled in without warning, catching ranchers and merchants alike off guard.',
+  ],
+  main_fragments_weather_middle: [
+    'The storm damaged {{weather.damage}} before moving on toward the eastern territories. {{weather.livestock}} were spooked but none reported lost, according to the livery stable.',
+    'Old Jim at the general store says his corns are aching — a sure sign of more {{weather.condition}} to come. Several families have already moved valuables to higher ground as a precaution.',
+    'Merchants on Main Street spent the morning clearing debris and assessing damage. The {{subject.building}} sustained minor harm but remains open for business.',
+    'Farmers report {{weather.livestock}} behaving strangely throughout the night. One rancher described the animals as "acting like they seen a ghost, or worse."',
+  ],
+  main_fragments_weather_end: [
+    '{{weather.forecast}} Locals are advised to secure loose property and keep lamps trimmed in case conditions worsen overnight.',
+    'Expect more of the same through the week, with {{weather.condition}} returning by Thursday. The forecast calls for clearing skies and warmer temperatures by midweek.',
+    'Look for {{weather.condition}} to persist through the weekend before a cold front moves in from the territories. Until then, stay indoors if you value your hat.',
+    'The outlook for {{city}}: {{weather.condition}} likely to continue, with temperatures remaining near {{weather.temperature}}. Old-timers advise keeping a weather eye on the horizon.',
+  ],
+  main_fragments_market_start: [
+    'Trade was brisk this week in {{city}}, {{state}}, with {{subject.product}} leading the market at {{price}} per unit. The loading dock at the general store was busy from dawn until dusk.',
+    'The {{city}} market saw mixed results this week. {{subject.product}} climbed to {{price}}, while {{random.product}} held steady despite rumours of a shortage.',
+    'Reports from {{state}} indicate a sharp rise in {{subject.product}} prices, now fetching {{price}} in {{city}}. New settlers passing through have driven demand to unprecedented levels.',
+    'Merchants in {{city}} report the busiest trading week in recent memory. {{subject.product}} and {{random.product}} both changed hands at prices not seen since before the war.',
+  ],
+  main_fragments_market_middle: [
+    'Local merchant {{merchant.name.full}} reports "I can\'t keep {{subject.product}}s on the shelf — they\'re going faster than hotcakes at a church social!" {{merchant.pronoun.subjective}} attributes the boom to new settlers arriving daily.',
+    '{{merchant.name.full}}, proprietor of the general store, said "It\'s the boom times, sure enough. I\'ve been selling {{subject.product}}s since before the war and I\'ve never seen the like."',
+    '{{merchant.name.formal}} attributes the spike to "all them new settlers coming through, each one wanting a {{subject.product}} of their own." Competition among vendors on Main Street has grown fierce.',
+    'Several merchants complained of supply delays from the eastern rail lines. {{merchant.name.full}} noted that {{random.product}} shipments have been particularly unreliable of late.',
+  ],
+  main_fragments_market_end: [
+    'Prices for {{subject.product}} are expected to hold through the month, with {{random.product}} trending upward. The outlook for next week remains cautiously optimistic among {{city}} traders.',
+    'The outlook for next week: {{subject.product}} steady, {{random.product}} rising, and {{random.product}} in short supply. Cattle remain firm at ${{price_number}} per head.',
+    'Analysts expect the {{city}} market to remain active as long as settlers keep arriving in {{state}}. {{merchant.name.full}} plans to expand {{merchant.pronoun.clause}} inventory accordingly.',
+    'Merchants advise buyers to act quickly if they require {{subject.product}} at current prices. Several traders predict a correction once the settler rush subsides.',
+  ],
+  main_fragments_social_start: [
+    'The fine folk of {{city}}, {{state}} turned out in force this past Saturday for {{event}}. {{host.name.full}} hosted the affair at {{host.pronoun.clause}} {{subject.building}} on Main Street.',
+    'Society news from {{city}}, {{state}}: {{event}} was the highlight of the week, organised by {{host.name.full}} at the {{subject.building}}. Invitations were much sought after.',
+    'Word reaches us from {{city}} that {{event}} drew a record crowd. {{host.name.formal}} presided over the festivities with customary grace and a generous supply of refreshments.',
+    'The social calendar in {{city}} reached its peak this week with {{event}}. Every family of standing in {{state}} was represented, or so the host claimed.',
+  ],
+  main_fragments_social_middle: [
+    'The evening featured music, dancing, and a fine spread of victuals. "We don\'t get many excuses to put on our Sunday best out here," said one rancher\'s wife.',
+    '"It was the social event of the season," declared one attendee. "Everyone who is anyone was there — and a few who weren\'t, if you catch my meaning."',
+    'Attendees praised the music, dancing, and victuals on offer. Several guests remarked that {{host.name.full}} had outdone every previous affair in {{city}}.',
+    'The {{subject.building}} was decorated with ribbons and lanterns for the occasion. Children ran between the tables while their elders discussed ranch prices and territorial politics.',
+  ],
+  main_fragments_social_end: [
+    '{{host.name.full}} declared the affair "the social event of the season" in {{state}}. {{host.pronoun.subjective}} has already begun planning next year\'s celebration.',
+    '{{host.name.formal}}, who presided over the festivities, remarked "It does the heart good to see the community come together like this — we need more of it and less of the other."',
+    'Society columnists agree that {{event}} has set a new standard for gatherings in {{city}}. We look forward to reporting on whatever {{host.name.full}} arranges next.',
+    'As the last guests departed into the {{state}} night, {{host.name.full}} was heard to say the evening exceeded every expectation. A fine time was had by all who attended.',
+  ],
+  main_fragments_notice_start: [
+    'NOTICE is hereby given that {{notice_type}}. All interested parties should take heed of the following provisions.',
+    'By order of the Sheriff\'s Office in {{city}}, {{state}}: {{notice_type}}. This notice is effective immediately upon posting.',
+    'PUBLIC NOTICE — {{notice_type}}. The following information is provided for the benefit of all citizens of {{city}} and the surrounding territory.',
+    'Citizens of {{city}} are advised that {{notice_type}}. The matter requires prompt attention from all affected parties.',
+  ],
+  main_fragments_notice_middle: [
+    'All interested parties should apply to the {{subject.building}} in {{city}}, {{state}} before {{next_date}}. Failure to respond by the deadline may result in penalties.',
+    'Enquiries may be directed to the {{subject.building}} in {{city}}, {{state}} during regular business hours. Written applications are preferred and should include full particulars.',
+    'Failure to comply may result in {{sentence.text}}. The Sheriff\'s Office will enforce this notice without further warning after the deadline passes.',
+    'Additional details may be obtained at the {{subject.building}} on Main Street. Clerks are available to assist with paperwork and answer questions regarding compliance.',
+  ],
+  main_fragments_notice_end: [
+    '{{notice_sign_off}} All citizens of {{city}} are expected to comply without delay.',
+    '{{notice_sign_off}} Posted this day in {{city}}, {{state}}, by authority of the territorial government.',
+    '{{notice_sign_off}} Let it be known throughout {{state}} that violations will not be tolerated.',
+    '{{notice_sign_off}} Distribute this notice to any neighbour who may not have seen it posted.',
+  ],
 };
+
+const FRAGMENT_STRUCTURE_BY_TYPE = {
+  crime: {
+    start: 'main_fragments_starts',
+    middle: ['main_fragments_witness', 'main_fragments_officer'],
+    end: 'main_fragments_plea',
+  },
+  weather: {
+    start: 'main_fragments_weather_start',
+    middle: ['main_fragments_weather_middle'],
+    end: 'main_fragments_weather_end',
+  },
+  market: {
+    start: 'main_fragments_market_start',
+    middle: ['main_fragments_market_middle'],
+    end: 'main_fragments_market_end',
+  },
+  social: {
+    start: 'main_fragments_social_start',
+    middle: ['main_fragments_social_middle'],
+    end: 'main_fragments_social_end',
+  },
+  notice: {
+    start: 'main_fragments_notice_start',
+    middle: ['main_fragments_notice_middle'],
+    end: 'main_fragments_notice_end',
+  },
+};
+
+function pick_main_fragment_pool(structure, index, total) {
+  if (total <= 1) return structure.start;
+  if (index === 0) return structure.start;
+  if (index === total - 1) return structure.end;
+  const middle = structure.middle;
+  return middle[(index - 1) % middle.length];
+}
 
 // ---------------------------------------------------------------------------
 // Article blueprints — data-driven paragraph composition
@@ -511,6 +716,7 @@ function list_blueprints() {
 // Pronoun tables
 // ---------------------------------------------------------------------------
 
+// Pronoun keys: subjective (he/she), objective (him/her), clause (his/her possessive)
 const PRONOUNS = {
   male: {
     title: 'Mr',
@@ -535,63 +741,6 @@ const PRONOUNS = {
     polite_group: 'ladies',
   },
 };
-
-// ---------------------------------------------------------------------------
-// Built-in fallback advertisements
-// ---------------------------------------------------------------------------
-
-// Each ad returns structured data: { title, lines, note }
-// The newspaper_sheet.hbs template renders this into HTML.
-const BUILTIN_ADS = [
-  {
-    id: 'dc.patent_medicine',
-    weight: 10,
-    render: () => ({
-      title: "DR. SCUTTLE'S PATENT TONIC",
-      lines: [
-        'Cures Rheumatism, Gout, Neuralgia, and General Malaise!',
-        'Contains 12% Opium by Volume — Safe for All Ages!',
-      ],
-      note: 'Available at your local Apothecary — 25¢ per Bottle',
-    }),
-  },
-  {
-    id: 'dc.railroad',
-    weight: 10,
-    render: () => ({
-      title: 'TRANS-CONTINENTAL RAILROAD',
-      lines: [
-        'Now Offering Direct Service to All Major Cities!',
-        'Coach: $12 • Sleeper: $25 • Private Car: $100',
-      ],
-      note: '"The Fastest Way West!"',
-    }),
-  },
-  {
-    id: 'dc.undertaker',
-    weight: 5,
-    render: () => ({
-      title: 'MCMURTRY & SONS — UNDERTAKERS',
-      lines: [
-        'Dignified Service at Reasonable Rates',
-        'Quality Pine Boxes Always in Stock',
-      ],
-      note: 'Corner of Boot Hill & Main — Open Day and Night',
-    }),
-  },
-  {
-    id: 'dc.stagecoach',
-    weight: 8,
-    render: () => ({
-      title: 'BUTTERFIELD OVERLAND MAIL',
-      lines: [
-        'Stage Departures Three Times Weekly!',
-        'Armed Escort Available — Baggage Insured',
-      ],
-      note: 'Reserve Your Seat at the General Store',
-    }),
-  },
-];
 
 // ---------------------------------------------------------------------------
 // Module content registry
@@ -713,8 +862,8 @@ function random_next_date(rng, main_date_str) {
 
 /** Generate a random paper name. */
 function random_paper_name(rng) {
-  const adj = pick(rng, DATA.paper_name_adjectives);
-  const noun = pick(rng, DATA.paper_name_nouns);
+  const adj = pick_vl(rng, 'paper_name_adjectives');
+  const noun = pick_vl(rng, 'paper_name_nouns');
   return `The ${adj} ${noun}`;
 }
 
@@ -740,13 +889,13 @@ async function make_character(role, rng) {
   };
 
   if (role === 'officer') {
-    char.rank = pick(rng, DATA.officer_ranks);
+    char.rank = pick_vl(rng, 'officer_ranks');
     char.name.full = `${char.rank} ${first} ${last}`;
     char.name.formal = `${char.rank} ${last}`;
   } else if (role === 'witness') {
-    char.profession = pick(rng, DATA.professions);
+    char.profession = pick_vl(rng, 'professions');
   } else if (role === 'culprit') {
-    char.profession = pick(rng, DATA.professions);
+    char.profession = pick_vl(rng, 'professions');
   }
 
   return char;
@@ -828,7 +977,14 @@ function resolve_token(token, ctx, rng) {
 
   // --- Number tokens ---
   if (root === 'number') {
-    if (parts[1] === 'sub_1') return String(DATA.number_lookup[DATA.numbers.indexOf(ctx.number)] - 1);
+    const numbers = get_effective_value_list('numbers');
+    if (parts[1] === 'sub_1') {
+      const idx = numbers.indexOf(ctx.number);
+      if (idx >= 0 && idx < DATA.number_lookup.length) {
+        return String(DATA.number_lookup[idx] - 1);
+      }
+      return '';
+    }
     return ctx.number ?? '';
   }
 
@@ -844,30 +1000,30 @@ function resolve_token(token, ctx, rng) {
   }
 
   // --- Static word picks ---
-  if (root === 'cunning') return pick(rng, DATA.cunning);
-  if (root === 'captures') return pick(rng, DATA.captures);
-  if (root === 'captured') return pick(rng, DATA.captured);
-  if (root === 'dastardly') return pick(rng, DATA.dastardly);
-  if (root === 'reporter_insult') return pick(rng, DATA.reporter_insults);
-  if (root === 'plea_for_order') return pick(rng, DATA.pleas_for_order);
-  if (root === 'spooky_possession') return pick(rng, DATA.spooky_possessions);
+  if (root === 'cunning') return pick_vl(rng, 'cunning');
+  if (root === 'captures') return pick_vl(rng, 'captures');
+  if (root === 'captured') return pick_vl(rng, 'captured');
+  if (root === 'dastardly') return pick_vl(rng, 'dastardly');
+  if (root === 'reporter_insult') return pick_vl(rng, 'reporter_insults');
+  if (root === 'plea_for_order') return pick_vl(rng, 'pleas_for_order');
+  if (root === 'spooky_possession') return pick_vl(rng, 'spooky_possessions');
   if (root === 'age') return String(Math.floor(rng() * 68) + 12);
 
   // --- Random word picks ---
   if (root === 'random') {
     const sub = parts[1];
-    if (sub === 'animal') return pick(rng, DATA.animals);
-    if (sub === 'colour') return pick(rng, DATA.colours);
+    if (sub === 'animal') return pick_vl(rng, 'animals');
+    if (sub === 'colour') return pick_vl(rng, 'colours');
     if (sub === 'crime') {
-      const c = pick(rng, DATA.crime_list);
+      const c = pick(rng, get_effective_crime_list());
       return resolve_nested(c.article, ctx, rng);
     }
     if (sub === 'building') {
-      const b = pick(rng, DATA.buildings);
+      const b = pick_vl(rng, 'buildings');
       return resolve_nested(b, ctx, rng);
     }
-    if (sub === 'number') return pick(rng, DATA.numbers);
-    if (sub === 'product') return pick(rng, DATA.products);
+    if (sub === 'number') return pick_vl(rng, 'numbers');
+    if (sub === 'product') return pick_vl(rng, 'products');
     if (sub === 'name') {
       const gender = parts[2] || (rng() > 0.5 ? 'male' : 'female');
       // Synchronous fallback — won't have the async name, use a simple pick
@@ -921,6 +1077,10 @@ function resolve_token(token, ctx, rng) {
   if (root === 'editor_name') return ctx.editor_name || '';
   if (root === 'next_date') return ctx.next_date || '';
 
+  // --- Continued phrase tokens (flavour brief side articles) ---
+  if (root === 'continued_page') return ctx.continued_page != null ? String(ctx.continued_page) : '';
+  if (root === 'continued_column') return ctx.continued_column ?? '';
+
   return undefined; // Leave unresolved tokens in place
 }
 
@@ -945,18 +1105,17 @@ function resolve_nested(str, ctx, rng) {
  * @returns {Promise<Object>} context object
  */
 async function build_context(rng, context_type = 'crime', extra = {}) {
-  const territories = Object.keys(DATA.states);
+  const territories = list_all_territories();
   const territory = pick(rng, territories);
-  const state = pick(rng, DATA.states[territory]);
-  const cities = DATA.cities[state] || ['Unknown'];
-  const city = pick(rng, cities);
+  const states = get_effective_states(territory);
+  const state = pick(rng, states.length ? states : ['Unknown']);
+  const city = pick(rng, get_effective_cities(state));
 
-  // Pre-pick subject values (used across multiple article types)
-  const subject_animal = pick(rng, DATA.animals);
-  const building = pick(rng, DATA.buildings);
-  const contraband = pick(rng, DATA.contraband);
-  const fraud = pick(rng, DATA.fraud);
-  const product = pick(rng, DATA.products);
+  const subject_animal = pick_vl(rng, 'animals');
+  const building = pick_vl(rng, 'buildings');
+  const contraband = pick_vl(rng, 'contraband');
+  const fraud = pick_vl(rng, 'fraud');
+  const product = pick_vl(rng, 'products');
 
   // Start with shared base context
   const ctx = {
@@ -974,48 +1133,47 @@ async function build_context(rng, context_type = 'crime', extra = {}) {
 
   if (context_type === 'weather') {
     ctx.weather = {
-      condition: pick(rng, DATA.weather_conditions),
-      temperature: pick(rng, DATA.weather_temperatures),
-      forecast: pick(rng, DATA.weather_forecasts),
-      year: pick(rng, DATA.weather_years),
-      damage: pick(rng, DATA.weather_damages),
-      livestock: pick(rng, DATA.weather_livestock),
+      condition: pick_vl(rng, 'weather_conditions'),
+      temperature: pick_vl(rng, 'weather_temperatures'),
+      forecast: pick_vl(rng, 'weather_forecasts'),
+      year: pick_vl(rng, 'weather_years'),
+      damage: pick_vl(rng, 'weather_damages'),
+      livestock: pick_vl(rng, 'weather_livestock'),
     };
     return ctx;
   }
 
   if (context_type === 'market') {
     ctx.char.merchant = await make_character('merchant', rng);
-    ctx.price = pick(rng, DATA.market_price_values);
-    ctx.price_number = pick(rng, DATA.price_numbers);
+    ctx.price = pick_vl(rng, 'market_price_values');
+    ctx.price_number = pick_vl(rng, 'price_numbers');
     return ctx;
   }
 
   if (context_type === 'social') {
     ctx.char.host = await make_character('host', rng);
-    ctx.event = pick(rng, DATA.social_events);
+    ctx.event = pick_vl(rng, 'social_events');
     return ctx;
   }
 
   if (context_type === 'notice') {
-    ctx.crime = pick(rng, DATA.crime_list); // notice types may reference crime
-    ctx.crime_count = pick(rng, DATA.numbers);
-    ctx.number = pick(rng, DATA.numbers);
-    const sentence = pick(rng, DATA.sentences);
-    const sentence_number = pick(rng, DATA.numbers);
+    ctx.crime = pick(rng, get_effective_crime_list());
+    ctx.crime_count = pick_vl(rng, 'numbers');
+    ctx.number = pick_vl(rng, 'numbers');
+    const sentence = pick_vl(rng, 'sentences');
+    const sentence_number = pick_vl(rng, 'numbers');
     ctx.sentence = apply_templates(sentence, { number: sentence_number, sentence_number, sentence }, rng);
     ctx.sentence_number = sentence_number;
-    ctx.notice_type = apply_templates(pick(rng, DATA.notice_types), { ...ctx, reward: pick(rng, DATA.rewards) }, rng);
-    ctx.reward = pick(rng, DATA.rewards);
-    ctx.notice_sign_off = apply_templates(pick(rng, DATA.notice_sign_offs), { city: ctx.city }, rng);
+    ctx.notice_type = apply_templates(pick_vl(rng, 'notice_types'), { ...ctx, reward: pick_vl(rng, 'rewards') }, rng);
+    ctx.reward = pick_vl(rng, 'rewards');
+    ctx.notice_sign_off = apply_templates(pick_vl(rng, 'notice_sign_offs'), { city: ctx.city }, rng);
     return ctx;
   }
 
-  // --- Default: crime context (original behaviour) ---
-  const crime = pick(rng, DATA.crime_list);
-  const number = pick(rng, DATA.numbers);
-  const sentence = pick(rng, DATA.sentences);
-  const sentence_number = pick(rng, DATA.numbers);
+  const crime = pick(rng, get_effective_crime_list());
+  const number = pick_vl(rng, 'numbers');
+  const sentence = pick_vl(rng, 'sentences');
+  const sentence_number = pick_vl(rng, 'numbers');
 
   const culprit = await make_character('culprit', rng);
   const officer = await make_character('officer', rng);
@@ -1024,7 +1182,7 @@ async function build_context(rng, context_type = 'crime', extra = {}) {
   const resolved_sentence = apply_templates(sentence, { number: sentence_number, sentence_number, sentence }, rng);
 
   ctx.crime = crime;
-  ctx.crime_count = pick(rng, DATA.numbers);
+  ctx.crime_count = pick_vl(rng, 'numbers');
   ctx.number = number;
   ctx.sentence = resolved_sentence;
   ctx.sentence_number = sentence_number;
@@ -1038,8 +1196,9 @@ async function build_context(rng, context_type = 'crime', extra = {}) {
 
 /**
  * Pick a blueprint by weight from the full pool (built-in + registered).
- * If `scope` is 'main', picks from all blueprints. If 'brief', picks only
- * from blueprints whose id ends with '_brief'.
+ * If `scope` is 'main', picks from full-length lead blueprints. If 'brief',
+ * picks only flavour side-column stubs (is_flavour) — single tease paragraph
+ * with a 'continued on page X' line, no editor byline.
  * @param {Object} rng
  * @param {string} [scope] — 'main' (default) or 'brief'
  * @returns {Object} blueprint object (with _id added)
@@ -1048,7 +1207,7 @@ function pick_blueprint(rng, scope = 'main', options = {}) {
   const all = { ...ARTICLE_BLUEPRINTS, ..._blueprint_registry };
 
   if (scope === 'brief') {
-    const entries = Object.entries(all).filter(([id]) => id.endsWith('_brief'));
+    const entries = Object.entries(all).filter(([, bp]) => bp.is_flavour);
     if (entries.length === 0) {
       return ARTICLE_BLUEPRINTS.flavour_brief
         ? { id: 'flavour_brief', ...ARTICLE_BLUEPRINTS.flavour_brief }
@@ -1071,13 +1230,14 @@ function pick_blueprint(rng, scope = 'main', options = {}) {
  * Generate a single procedural news article as a structured data object.
  *
  * If no blueprint_id is given, one is picked at random (weighted). For
- * side articles, pass blueprint_scope='brief' to restrict to short
- * blueprints. For the main article, pass 'main' (or omit) to allow any.
+ * side articles, pass blueprint_scope='brief' for flavour stubs (single
+ * tease + continued line). For the main article, pass 'main' (or omit).
+ * Specific brief types (e.g. crime_brief) require blueprint_id.
  *
  * @param {Object} [options]
  * @param {string} [options.seed]           — seed for deterministic output
  * @param {string} [options.blueprint_id]   — specific blueprint to use
- * @param {string} [options.blueprint_scope] — 'main' (default) or 'brief'
+ * @param {string} [options.blueprint_scope] — 'main' (default) or 'brief' (flavour stub)
  * @param {Object} [options.extra_ctx]       — extra context values to merge
  * @returns {Promise<Object>} article data { headline, paragraphs, editor, city, state, type }
  */
@@ -1096,7 +1256,7 @@ async function generate_article(options = {}) {
   const ctx = await build_context(rng, blueprint.context_type, options.extra_ctx || {});
 
   // Headline
-  const headline_pool = DATA[blueprint.headline_pool] || DATA.headlines;
+  const headline_pool = get_effective_pool(blueprint.headline_pool) || get_effective_pool('headlines');
   let headline = apply_templates(pick(rng, headline_pool), ctx, rng);
   headline = capitalize(headline);
 
@@ -1108,34 +1268,29 @@ async function generate_article(options = {}) {
     const slot = blueprint.paragraphs[i];
     const include = slot.required || rng() < (slot.chance ?? 1);
     if (!include) continue;
-    const pool = DATA[slot.pool];
+    const pool = get_effective_pool(slot.pool);
     if (!pool || pool.length === 0) continue;
     const text = apply_templates(pick(rng, pool), ctx, rng);
     paragraphs.push(text);
     used_slots.add(i);
   }
 
-  // Main articles should have at least 4 paragraphs to fill the column
-  // space. If we fell short, backfill from remaining (non-required) slots
-  // that were skipped. If we run out of skipped slots, keep drawing
-  // additional paragraphs from the first (required) pool.
   const is_flavour = !!blueprint.is_flavour;
-  const is_main = !is_flavour && (options.blueprint_scope || 'main') === 'main' && !options.blueprint_id?.endsWith('_brief');
-  const min_paragraphs = is_main ? 4 : 1;
+  const min_paragraphs = 1;
   if (paragraphs.length < min_paragraphs) {
     const skipped = blueprint.paragraphs
       .map((slot, i) => ({ slot, i }))
       .filter(({ i }) => !used_slots.has(i));
     for (const { slot, i } of skipped) {
       if (paragraphs.length >= min_paragraphs) break;
-      const pool = DATA[slot.pool];
+      const pool = get_effective_pool(slot.pool);
       if (!pool || pool.length === 0) continue;
       paragraphs.push(apply_templates(pick(rng, pool), ctx, rng));
       used_slots.add(i);
     }
     // Still short? Keep drawing from the first required pool
     if (paragraphs.length < min_paragraphs) {
-      const first_pool = DATA[blueprint.paragraphs[0]?.pool];
+      const first_pool = get_effective_pool(blueprint.paragraphs[0]?.pool);
       if (first_pool && first_pool.length > 0) {
         while (paragraphs.length < min_paragraphs) {
           paragraphs.push(apply_templates(pick(rng, first_pool), ctx, rng));
@@ -1148,7 +1303,7 @@ async function generate_article(options = {}) {
   if (paragraphs.length === 0) {
     const first_slot = blueprint.paragraphs.find(s => s.required) || blueprint.paragraphs[0];
     if (first_slot) {
-      const pool = DATA[first_slot.pool];
+      const pool = get_effective_pool(first_slot.pool);
       if (pool && pool.length > 0) {
         paragraphs.push(apply_templates(pick(rng, pool), ctx, rng));
       }
@@ -1163,7 +1318,7 @@ async function generate_article(options = {}) {
   if (is_flavour) {
     const continued_page = Math.floor(rng() * 8) + 2; // pages 2-9
     const continued_column = String.fromCharCode(65 + Math.floor(rng() * 4)); // A-D
-    const phrase_template = pick(rng, DATA.continued_phrases);
+    const phrase_template = pick(rng, get_effective_pool('continued_phrases'));
     continued = apply_templates(phrase_template, { continued_page, continued_column }, rng);
   }
 
@@ -1179,33 +1334,54 @@ async function generate_article(options = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Advertisement selection (returns data, not HTML)
+// Main article fragment generation (slot-grid layout)
 // ---------------------------------------------------------------------------
 
 /**
- * Select an advertisement from registered content + built-in fallbacks.
- * @param {Object} rng     — seeded RNG
- * @param {Object} [filters] — optional { ids: [...], sources: [...], exclude_ids: Set<string> }
- * @returns {Object|null} ad data { id, title, lines, note }
+ * Generate short main-article fragments for slot-grid layout.
+ * @param {number} count
+ * @param {Object} [options]
+ * @returns {Promise<Object>}
  */
-function select_advertisement(rng, filters) {
-  let pool = [..._content_registry.advertisement, ...BUILTIN_ADS];
-
-  if (filters?.ids) {
-    pool = pool.filter(a => filters.ids.includes(a.id));
+async function generate_main_fragments(count, options = {}) {
+  const rng = create_rng(options.seed);
+  let blueprint = options.blueprint_id ? get_blueprint(options.blueprint_id) : null;
+  if (!blueprint) {
+    blueprint = pick_blueprint(rng, 'main', options);
   }
-  if (filters?.sources) {
-    pool = pool.filter(a => filters.sources.includes(a.source));
-  }
-  if (filters?.exclude_ids && filters.exclude_ids.size > 0) {
-    pool = pool.filter(a => !filters.exclude_ids.has(a.id));
+  if (!blueprint) blueprint = ARTICLE_BLUEPRINTS.crime_full;
+
+  const ctx = await build_context(rng, blueprint.context_type, options.extra_ctx || {});
+
+  const headline_pool = get_effective_pool(blueprint.headline_pool) || get_effective_pool('headlines');
+  let headline = apply_templates(pick(rng, headline_pool), ctx, rng);
+  headline = capitalize(headline);
+
+  const structure = FRAGMENT_STRUCTURE_BY_TYPE[blueprint.context_type] || FRAGMENT_STRUCTURE_BY_TYPE.crime;
+  const fragments = [];
+  for (let i = 0; i < count; i++) {
+    const pool_key = pick_main_fragment_pool(structure, i, count);
+    const pool = get_effective_pool(pool_key);
+    const text = pool?.length ? apply_templates(pick(rng, pool), ctx, rng) : '';
+    fragments.push({ text, drop_cap: i === 0 });
   }
 
-  const ad = pick_weighted(rng, pool);
-  if (!ad) return null;
+  const editor_name = _generate_random_name
+    ? await _generate_random_name('american', 'male')
+    : 'A. Editor';
 
-  const content = ad.render({ rng });
-  return { id: ad.id, ...content };
+  return {
+    headline,
+    fragments,
+    editor: editor_name,
+    city: ctx.city,
+    state: ctx.state,
+    type: blueprint.context_type,
+  };
+}
+
+function pick_advertisement(rng, filters) {
+  return select_advertisement(rng, filters, _content_registry.advertisement);
 }
 
 // ---------------------------------------------------------------------------
@@ -1236,22 +1412,26 @@ async function generate_newspaper(options = {}) {
   const mode = options.mode || 'random';
   const rng = create_rng(options.seed);
 
-  // Paper details
   const paper_name = options.paper_name || 'The Tombstone Epitaph';
   const date = options.date || random_date(rng);
   const next_date = random_next_date(rng, date);
   const columns = options.columns || 2;
   const side_count = options.side_articles ?? 4;
   const ad_count = options.advertisements ?? 2;
-  const price = options.price || pick(rng, DATA.paper_prices);
+  const price = options.price || pick_vl(rng, 'paper_prices');
   const volume = Math.floor(rng() * 9) + 1;
   const issue = Math.floor(rng() * 52) + 1;
+  const fragment_count = Math.max(1, side_count + ad_count);
+  const slots_per_column = calculate_slots_per_column(side_count, ad_count, columns);
 
-  // Editor name
-  const editor_name = _generate_random_name ? await _generate_random_name('american', 'male') : 'A. Editor';
+  const editor_name = _generate_random_name
+    ? await _generate_random_name('american', 'male')
+    : 'A. Editor';
 
-  // --- Mode: scaffold (blank layout) ---
+  const paper_ctx = { paper_name, editor_name, next_date };
+
   if (mode === 'scaffold') {
+    const layout = build_scaffold_layout(slots_per_column, columns);
     return {
       paper_name,
       date,
@@ -1259,8 +1439,9 @@ async function generate_newspaper(options = {}) {
       volume: roman(volume),
       issue,
       columns,
+      layout,
       main_article: { headline: '', paragraphs: [], editor: editor_name },
-      side_articles: Array.from({ length: side_count }, (_, i) => ({
+      side_articles: Array.from({ length: side_count }, () => ({
         headline: '',
         paragraphs: [],
         editor: '',
@@ -1277,34 +1458,34 @@ async function generate_newspaper(options = {}) {
     };
   }
 
-  // --- Build main article ---
   let main_article;
   let main_city = '';
   let main_state = '';
-
-  // Paper-level context passed to all articles (for colophon/paper tokens)
-  const paper_ctx = { paper_name, editor_name, next_date };
+  let main_fragments;
 
   if (mode === 'hybrid' && (options.main_article_text || options.main_article_headline)) {
-    const body = options.main_article_text || '';
+    main_fragments = split_into_fragments(options.main_article_text || '', fragment_count);
     main_article = {
       headline: options.main_article_headline || '',
-      paragraphs: body ? body.split(/\n\n+/).filter(p => p.trim()) : [],
+      paragraphs: main_fragments.map(f => f.text).filter(Boolean),
       editor: editor_name,
     };
   } else {
-    const article = await generate_article({
+    const main = await generate_main_fragments(fragment_count, {
       seed: options.seed,
-      blueprint_scope: 'main',
       main_lead: options.main_lead,
       extra_ctx: paper_ctx,
     });
-    main_article = { ...article };
-    main_city = article.city;
-    main_state = article.state;
+    main_fragments = main.fragments;
+    main_article = {
+      headline: main.headline,
+      paragraphs: main.fragments.map(f => f.text),
+      editor: main.editor,
+    };
+    main_city = main.city;
+    main_state = main.state;
   }
 
-  // --- Build side articles (shorter 'brief' blueprints) ---
   const side_articles = [];
   for (let i = 0; i < side_count; i++) {
     side_articles.push(await generate_article({
@@ -1314,18 +1495,27 @@ async function generate_newspaper(options = {}) {
     }));
   }
 
-  // --- Select advertisements (no duplicates) ---
   const advertisements = [];
   const used_ad_ids = new Set();
   for (let i = 0; i < ad_count; i++) {
-    const ad = select_advertisement(rng, { ...options.content_filters, exclude_ids: used_ad_ids });
+    const ad = pick_advertisement(rng, { ...options.content_filters, exclude_ids: used_ad_ids });
     if (ad) {
       used_ad_ids.add(ad.id);
       advertisements.push({ ...ad, column: i % 2 === 0 ? 'left' : 'right' });
     }
   }
 
-  // --- Build colophon ---
+  let layout = pack_column_slots({
+    slots_per_column,
+    side_articles,
+    featured_ads: advertisements,
+    main_fragments,
+    center_columns: columns,
+  });
+
+  layout = fill_empty_slots(layout, pick_advertisement, rng, used_ad_ids);
+  main_article.paragraphs = collect_main_paragraphs(layout);
+
   const colophon = apply_templates(
     pick(rng, DATA.colophons),
     { paper_name, editor_name, next_date, city: main_city },
@@ -1339,6 +1529,7 @@ async function generate_newspaper(options = {}) {
     volume: roman(volume),
     issue,
     columns,
+    layout,
     main_article,
     side_articles,
     advertisements,
@@ -1357,6 +1548,234 @@ function roman(num) {
 }
 
 // ---------------------------------------------------------------------------
+// Editor palette API — fragment templates for drag-and-drop layout
+// ---------------------------------------------------------------------------
+
+const STORY_TYPE_HEADLINE_POOL = {
+  crime: 'headlines',
+  weather: 'weather_headlines',
+  market: 'market_headlines',
+  social: 'social_headlines',
+  notice: 'notice_headlines',
+};
+
+const MAIN_POOL_ROLE_LABELS = {
+  start: 'Start',
+  middle: 'Middle',
+  end: 'End',
+};
+
+function _main_palette_id(story_type, role, pool_key) {
+  const suffix = pool_key.replace(/^main_fragments_/, '').replace(`${story_type}_`, '');
+  return `main:${story_type}:${suffix}`;
+}
+
+/**
+ * Grouped palette metadata for the newspaper editor asset panel.
+ * @returns {Array<{ id: string, label: string, items: Array<Object> }>}
+ */
+function get_fragment_palette_groups() {
+  const groups = [];
+
+  for (const [story_type, structure] of Object.entries(FRAGMENT_STRUCTURE_BY_TYPE)) {
+    const items = [];
+    items.push({
+      id: _main_palette_id(story_type, 'start', structure.start),
+      label: MAIN_POOL_ROLE_LABELS.start,
+      icon: 'fa-book-open',
+      pool_key: structure.start,
+      story_type,
+      slot_type: 'main_fragment',
+      zone: 'center',
+    });
+    structure.middle.forEach((pool_key, i) => {
+      const pool_suffix = pool_key.replace(/^main_fragments_/, '').replace(`${story_type}_`, '');
+      items.push({
+        id: _main_palette_id(story_type, 'middle', pool_key),
+        label: structure.middle.length > 1 ? pool_suffix.replace(/_/g, ' ') : MAIN_POOL_ROLE_LABELS.middle,
+        icon: 'fa-align-left',
+        pool_key,
+        story_type,
+        slot_type: 'main_fragment',
+        zone: 'center',
+        middle_index: i,
+      });
+    });
+    items.push({
+      id: _main_palette_id(story_type, 'end', structure.end),
+      label: MAIN_POOL_ROLE_LABELS.end,
+      icon: 'fa-flag-checkered',
+      pool_key: structure.end,
+      story_type,
+      slot_type: 'main_fragment',
+      zone: 'center',
+    });
+    groups.push({
+      id: `main_${story_type}`,
+      label: story_type.charAt(0).toUpperCase() + story_type.slice(1),
+      items,
+    });
+  }
+
+  groups.push({
+    id: 'side',
+    label: 'Side',
+    items: [{
+      id: 'side:brief',
+      label: 'Brief',
+      icon: 'fa-newspaper',
+      slot_type: 'side_article',
+    }],
+  });
+
+  const ad_items = [];
+  const registered = _content_registry.advertisement || [];
+  for (const ad of [...registered, ...BUILTIN_ADS]) {
+    if (ad_items.some(a => a.id === `ad:${ad.id}`)) continue;
+    ad_items.push({
+      id: `ad:${ad.id}`,
+      label: ad.label || ad.id.replace(/^dc\./, '').replace(/_/g, ' '),
+      icon: 'fa-bullhorn',
+      ad_id: ad.id,
+      slot_type: 'ad',
+    });
+  }
+  groups.push({ id: 'ads', label: 'Ads', items: ad_items });
+
+  return groups;
+}
+
+/**
+ * Return or build shared story context for coherent fragment generation.
+ * @param {Function} rng
+ * @param {string} story_type
+ * @param {Object|null} existing_ctx
+ * @param {Object} [extra_ctx]
+ * @returns {Promise<Object>}
+ */
+async function ensure_story_context(rng, story_type, existing_ctx, extra_ctx = {}) {
+  if (existing_ctx?.city) {
+    if (story_type === 'crime' && existing_ctx.char) return existing_ctx;
+    if (story_type !== 'crime') return existing_ctx;
+  }
+  const ctx = await build_context(rng, story_type, extra_ctx);
+  ctx._story_type = story_type;
+  return ctx;
+}
+
+/**
+ * Generate a headline from story context.
+ * @param {Object} rng
+ * @param {Object} story_context
+ * @param {string} [story_type]
+ * @returns {string}
+ */
+function generate_main_headline(rng, story_context, story_type = 'crime') {
+  const pool_key = STORY_TYPE_HEADLINE_POOL[story_type] || STORY_TYPE_HEADLINE_POOL.crime;
+  const headline_pool = get_effective_pool(pool_key) || get_effective_pool('headlines');
+  let headline = apply_templates(pick(rng, headline_pool), story_context, rng);
+  return capitalize(headline);
+}
+
+/**
+ * Resolve palette item metadata by id.
+ * @param {string} palette_id
+ * @returns {Object|null}
+ */
+function get_palette_item(palette_id) {
+  for (const group of get_fragment_palette_groups()) {
+    const item = group.items.find(i => i.id === palette_id);
+    if (item) return item;
+  }
+  return null;
+}
+
+/**
+ * Generate slot content from a palette template id.
+ * @param {string} palette_id
+ * @param {Object} story_context
+ * @param {Object} [options]
+ * @returns {Promise<Object>}
+ */
+async function generate_fragment_from_palette(palette_id, story_context, options = {}) {
+  const rng = create_rng(options.seed);
+  const custom = options.custom_fragments || [];
+
+  if (palette_id.startsWith('custom:')) {
+    const custom_id = palette_id.slice(7);
+    const frag = custom.find(c => c.id === custom_id);
+    const raw = frag?.text || '';
+    const text = raw.includes('{{')
+      ? apply_templates(raw, story_context || {}, rng)
+      : raw;
+    return {
+      type: 'main_fragment',
+      text,
+      drop_cap: !!options.drop_cap,
+      palette_id,
+    };
+  }
+
+  const item = get_palette_item(palette_id);
+  if (!item) return { type: 'empty' };
+
+  if (item.slot_type === 'main_fragment') {
+    const pool = get_effective_pool(item.pool_key);
+    const text = pool?.length ? apply_templates(pick(rng, pool), story_context, rng) : '';
+    return {
+      type: 'main_fragment',
+      text,
+      drop_cap: !!options.drop_cap,
+      palette_id,
+      pool_key: item.pool_key,
+      story_type: item.story_type,
+    };
+  }
+
+  if (item.slot_type === 'side_article') {
+    const stub = await generate_article({
+      seed: options.seed,
+      blueprint_scope: 'brief',
+      extra_ctx: {
+        paper_name: options.paper_name || story_context.paper_name,
+        ...story_context,
+      },
+    });
+    const continued_pool = get_effective_pool('continued_phrases');
+    const continued = apply_templates(pick(rng, continued_pool), {
+      continued_page: Math.floor(rng() * 8) + 2,
+      continued_column: pick(rng, ['left', 'right', 'centre']),
+    }, rng);
+    return {
+      type: 'side_article',
+      headline: stub.headline,
+      paragraphs: stub.paragraphs,
+      editor: stub.editor || '',
+      continued,
+      palette_id,
+    };
+  }
+
+  if (item.slot_type === 'ad') {
+    const registered = _content_registry.advertisement || [];
+    const all_ads = [...registered, ...BUILTIN_ADS];
+    const def = all_ads.find(a => a.id === item.ad_id);
+    if (!def) return { type: 'empty' };
+    const content = def.render({ rng });
+    return {
+      type: 'ad',
+      id: def.id,
+      title: content.title || '',
+      lines: content.lines || [],
+      note: content.note || '',
+      palette_id,
+    };
+  }
+
+  return { type: 'empty' };
+}
+
+// ---------------------------------------------------------------------------
 // Init — wire the name generator from archetype_builder
 // ---------------------------------------------------------------------------
 
@@ -1369,6 +1788,15 @@ function init(name_generator) {
   _generate_random_name = name_generator;
 }
 
+register_pool_sources({
+  get_default_pool: (key) => DATA[key] || [],
+  fragment_structure: FRAGMENT_STRUCTURE_BY_TYPE,
+});
+
+register_value_list_sources({
+  get_default_data: () => DATA,
+});
+
 // ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
@@ -1380,5 +1808,11 @@ export {
   list_newspaper_content,
   register_article_blueprint,
   list_blueprints,
+  get_fragment_palette_groups,
+  ensure_story_context,
+  generate_main_headline,
+  generate_fragment_from_palette,
+  get_palette_item,
   init,
+  get_effective_pool,
 };

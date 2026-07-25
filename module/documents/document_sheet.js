@@ -2,15 +2,10 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ApplicationV2 } = foundry.applications.api;
 
 import { normalize_document_data } from "./document_categories.js";
-import { render_newspaper_html } from "./newspaper_render.js";
+import { render_document_html } from "./document_render.js";
 
 /**
- * Renders content based on the document's content_type:
- *   - ia_book: Internet Archive BookReader embedded via iframe
- *   - url:     Generic URL embedded via iframe
- *   - text:    Rich text content rendered inline
- *   - image:   Image displayed inline
- *   - newspaper: Structured newspaper data rendered via newspaper_sheet.hbs
+ * Renders content based on the document's content_type and structured data.
  */
 class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 
@@ -31,10 +26,6 @@ class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 		},
 	};
 
-	/**
-	 * @param {Object} item - The document item data from char.gear.documents
-	 * @param {Actor} actor - The actor who owns this document
-	 */
 	constructor(item, actor) {
 		const is_newspaper = (item.content_type || 'text') === 'newspaper';
 		const position = is_newspaper ? { width: 960, height: 700 } : { width: 800, height: 600 };
@@ -51,42 +42,23 @@ class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 		context.item = this.item;
 		context.content_type = this.item.content_type || 'text';
 		context.document_category = this.item.category || '';
-		context.embed_url = this._build_embed_url();
 		context.is_gm = game.user.isGM;
 
-		if (context.content_type === 'newspaper' && this.item.newspaper_data) {
-			context.newspaper_html = await render_newspaper_html(this.item.newspaper_data);
-		} else {
-			context.newspaper_html = '';
-		}
+		const rendered = await render_document_html(this.item);
+		context.document_html = rendered.html || '';
+		context.embed_url = rendered.embed_url || '';
+		context.newspaper_html = this.item.category === 'newspaper' ? context.document_html : '';
+
+		if (this.item.sourcebook_data?.url) context.item.url = this.item.sourcebook_data.url;
+		if (this.item.web_page_data?.url) context.item.url = this.item.web_page_data.url;
+		if (this.item.map_data?.image) context.item.image = this.item.map_data.image;
+		if (this.item.wanted_poster_data?.portrait) context.item.image = this.item.wanted_poster_data.portrait;
 
 		return context;
 	}
 
-	/**
-	 * Convert the document's URL into an embeddable iframe URL.
-	 * For Internet Archive books: https://archive.org/details/BOOK_ID → https://archive.org/embed/BOOK_ID
-	 * For generic URLs: use as-is.
-	 */
-	_build_embed_url() {
-		const url = (this.item.url || '').trim();
-		if (!url) return '';
-
-		// Internet Archive: convert /details/ to /embed/
-		if (url.includes('archive.org/details/')) {
-			return url.replace('archive.org/details/', 'archive.org/embed/');
-		}
-
-		// Already an embed URL? Use as-is.
-		if (url.includes('archive.org/embed/')) return url;
-
-		// Generic URL — use directly
-		return url;
-	}
-
 	_onRender(context, options) {
 		super._onRender(context, options);
-		// Open links in new tab, not inside the iframe container
 		this.element.querySelectorAll('a[target="_blank"]').forEach(a => {
 			a.addEventListener('click', (e) => {
 				e.preventDefault();

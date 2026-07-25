@@ -9,6 +9,8 @@
 
 const MODULE_ID = "dc-containers";
 
+import { container_catalog } from "./container_catalog.js";
+
 // ─── Module state ─────────────────────────────────────────────────────────
 
 let _open_sheet = null;
@@ -81,7 +83,7 @@ function build_display_items(contents) {
 	const items = [];
 	if (!contents || typeof contents !== "object") return items;
 
-	for (const entry of game.dc.gear_catalog.iterate_catalog()) {
+	for (const entry of container_catalog.iterate_container_catalog()) {
 		const stored = game.dc.utils.data_from_path(contents, entry.path);
 		const qty = stored?.qty ?? 0;
 		if (qty > 0) {
@@ -173,7 +175,7 @@ function _handle_container_update(data) {
 
 	// Notify the taking player
 	if (player_uuid && player_uuid === game.user.character?.uuid) {
-		const catalog_item = game.dc.gear_catalog.get_catalog_item(path);
+		const catalog_item = container_catalog.get_container_item(path);
 		const label = catalog_item?.label || path;
 		game.dc.msg.announce('Container', `You took: ${label}`);
 	}

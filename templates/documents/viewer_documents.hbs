@@ -26,7 +26,12 @@
 	{{/if}}
 	<tr><td>{{localize "dc.shared.rarity"}}</td><td>{{resolve_field this.template this.data 'rarity'}}</td></tr>
 </table>
-{{#if this.newspaper_html}}
+{{#if this.document_html}}
+<div class="viewer-text-content viewer-document-preview">
+	<h4 class="center">{{localize "dc.containers.doc.document_preview"}}</h4>
+	<div class="document-text">{{{this.document_html}}}</div>
+</div>
+{{else if this.newspaper_html}}
 <div class="viewer-text-content viewer-newspaper-preview">
 	<h4 class="center">{{localize "dc.containers.doc.newspaper_preview"}}</h4>
 	<div class="document-text">{{{this.newspaper_html}}}</div>

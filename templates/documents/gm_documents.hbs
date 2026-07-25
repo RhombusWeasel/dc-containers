@@ -16,6 +16,7 @@
       <th class="sort-list center" data-action="sortList" data-path="documents" data-key="weight" title="{{localize "dc.shared.weight"}}"><i class="fas fa-weight-hanging" /></th>
       <th class="sort-list center" data-action="sortList" data-path="documents" data-key="rarity" title="{{localize "dc.shared.rarity"}}"><i class="fas fa-gem" /></th>
       <th class="sort-list center" data-action="sortList" data-path="documents" data-key="cost" title="{{localize "dc.shared.cost"}}"><i class="fas fa-dollar-sign" /></th>
+      <th class="center width-5" title="{{localize "dc.shared.read"}}"><i class="fas fa-book-open" /></th>
       <th class="center width-5" title="{{localize "dc.shared.edit"}}"><i class="fas fa-pen-nib" /></th>
       <th class="center width-5" title="{{localize "dc.shared.duplicate"}}"><i class="fas fa-copy" /></th>
       <th class="center width-5" title="{{localize "dc.shared.trash"}}"><i class="fas fa-trash" /></th>
@@ -29,6 +30,9 @@
         <td class="right pad-right-4">{{doc.weight}}</td>
         <td class="left">{{lookup_localization "dc.equipment.rarity" doc.rarity}}</td>
         <td class="right">{{format_currency doc.cost}}</td>
+        <td data-action="readDocument" class="center read-document" data-path="gear.documents" data-key="{{@key}}">
+          <a class="fas fa-book-open" title="{{localize "dc.shared.read"}} {{doc.label}}" />
+        </td>
         <td data-action="editPath" class="center edit-path" data-path="gear.documents" data-key="{{@key}}"><a class="fas fa-pen-nib" title="{{localize "dc.shared.edit"}} {{doc.label}}"/></td>
         <td data-action="duplicatePath" class="center duplicate-path" data-path="gear.documents" data-key="{{@key}}"><a class="fas fa-copy" title="{{localize "dc.shared.duplicate"}} {{doc.label}}"/></td>
         <td data-action="deletePath" class="center delete-path" data-path="gear.documents.{{@key}}"><a class="fas fa-trash" title="{{localize "dc.shared.trash"}} {{doc.label}}?"/></td>

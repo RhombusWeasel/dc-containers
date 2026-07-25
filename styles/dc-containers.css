@@ -60,10 +60,40 @@
 .deadlands-classic .container-contents-summary {
 	font-size: 0.85em;
 	color: var(--dc-text-muted, #6b5d4f);
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
-.deadlands-classic .container-contents-tree {
+.deadlands-classic .container-contents-open {
+	width: 100%;
+}
+
+/* ─── Container contents editor popout ─────────────────────────────────── */
+
+.deadlands-classic.dc-container-contents-editor-app .container-contents-editor-sheet {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	padding: 4px 6px;
+}
+
+.deadlands-classic.dc-container-contents-editor-app .container-contents-editor-summary {
+	font-size: 0.85em;
+	color: var(--dc-text-muted, #6b5d4f);
+	margin-bottom: 6px;
+}
+
+.deadlands-classic.dc-container-contents-editor-app .gear-search-bar {
+	margin-bottom: 6px;
+}
+
+.deadlands-classic.dc-container-contents-editor-app .gear-search {
+	max-width: none;
+}
+
+.deadlands-classic.dc-container-contents-editor-app .container-contents-tree {
+	flex: 1;
+	min-height: 0;
 	border: 1px solid var(--dc-border-light, #d4c5a9);
 	border-radius: 3px;
 	padding: 4px;
@@ -85,8 +115,20 @@
 	padding: 2px 4px;
 }
 
-.deadlands-classic .container-qty-input {
-	width: 3.5em;
+.deadlands-classic .container-qty-stepper {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.deadlands-classic .container-qty-stepper a {
+	cursor: pointer;
+	padding: 0 2px;
+}
+
+.deadlands-classic .container-qty-value {
+	display: inline-block;
+	min-width: 1.5em;
 	text-align: center;
 }
 /* ─── Document Reader Sheet ─── */
@@ -241,6 +283,17 @@
   max-width: none;
 }
 
+.deadlands-classic .viewer-document-preview .document-text {
+  white-space: normal;
+}
+
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text:has(.dc-letter) {
+  padding: 16px 20px;
+  background: linear-gradient(180deg, #f4ead5 0%, #e8dcc4 100%);
+  border: 1px solid #9a7b5b;
+  color: #2a1f14;
+}
+
 /* ─────────────────────────────────────────────────────────────
  * Procedural Newspaper — document reader + viewer preview
  * Scoped under .document-sheet and .viewer-text-content
@@ -329,6 +382,86 @@
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   gap: 0;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-body--grid,
+.deadlands-classic .viewer-text-content .dc-newspaper-body--grid {
+  grid-template-columns: 1fr repeat(var(--dc-newspaper-center-cols, 2), 1fr) 1fr;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-col-slots,
+.deadlands-classic .viewer-text-content .dc-newspaper-col-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot {
+  flex: 1;
+  min-height: 4.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--main,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--main {
+  font-size: 0.95em;
+  line-height: 1.55;
+  text-align: justify;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--main p,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--main p {
+  margin: 0;
+  text-indent: 1.5em;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--drop-cap p,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--drop-cap p {
+  text-indent: 0;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--drop-cap p::first-letter,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--drop-cap p::first-letter {
+  float: left;
+  font-family: "Rye", serif;
+  font-size: 3em;
+  line-height: 0.85;
+  padding-right: 6px;
+  color: #3d2914;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--side .dc-newspaper-sub-article,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--side .dc-newspaper-sub-article {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  height: 100%;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--ad .dc-newspaper-advertisement,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--ad .dc-newspaper-advertisement {
+  margin: 0;
+  height: 100%;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content h4,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content h4 {
+  font-size: 0.9em;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content p,
+.deadlands-classic .viewer-text-content .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content p {
+  font-size: 0.75em;
+}
+
+.deadlands-classic.document-sheet .dc-newspaper-placeholder,
+.deadlands-classic .viewer-text-content .dc-newspaper-placeholder {
+  font-style: italic;
+  color: #8a7355;
+  text-indent: 0;
 }
 
 .deadlands-classic.document-sheet .dc-newspaper-col,
@@ -459,7 +592,6 @@
   font-weight: normal;
   letter-spacing: 0.06em;
   margin: 0 0 6px;
-  text-transform: uppercase;
 }
 
 .deadlands-classic.document-sheet .dc-newspaper-ad-content p,
@@ -497,6 +629,11 @@
     grid-template-columns: 1fr;
   }
 
+  .deadlands-classic.document-sheet .dc-newspaper-body--grid,
+  .deadlands-classic .viewer-text-content .dc-newspaper-body--grid {
+    grid-template-columns: 1fr;
+  }
+
   .deadlands-classic.document-sheet .dc-newspaper-col-side-left,
   .deadlands-classic.document-sheet .dc-newspaper-col-side-right,
   .deadlands-classic .viewer-text-content .dc-newspaper-col-side-left,
@@ -512,7 +649,1061 @@
   }
 }
 
-.deadlands-classic .editor-form-table .editor-generate-newspaper {
+.deadlands-classic .editor-form-table .editor-open-newspaper {
   cursor: pointer;
   margin-left: 4px;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-toolbar {
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border-light-2, #ccc);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-toolbar__spacer {
+  flex: 1;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-btn {
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: var(--font-size-12, 0.75rem);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-btn--primary {
+  font-weight: bold;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-generate-panel {
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-border-light-2, #ccc);
+  background: var(--color-bg-option, rgba(0, 0, 0, 0.03));
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-generate-row {
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Newspaper editor preview — same slot-grid layout as document reader */
+.newspaper-editor-sheet-app .dc-newspaper-editor-preview {
+  font-family: "Special Elite", monospace;
+  color: #2a1f14;
+  background: linear-gradient(180deg, #f4ead5 0%, #e8dcc4 100%);
+  padding: 24px 32px;
+  border: 2px double #5c4033;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-masthead {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-rule {
+  border: none;
+  border-top: 1px solid #5c4033;
+  margin: 8px 0;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-rule--double {
+  border-top: 3px double #5c4033;
+  margin: 4px 0 8px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-body {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 0;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-body--grid {
+  grid-template-columns: 1fr repeat(var(--dc-newspaper-center-cols, 2), 1fr) 1fr;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-col-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-col {
+  padding: 0 12px;
+  min-width: 0;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-col-side-left {
+  border-right: 1px solid #9a7b5b;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-col-side-right {
+  border-left: 1px solid #9a7b5b;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-slot {
+  flex: 1;
+  min-height: 4.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-slot--main {
+  font-size: 0.95em;
+  line-height: 1.55;
+  text-align: justify;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-placeholder {
+  font-style: italic;
+  color: #8a7355;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-advertisement {
+  border: 2px solid #2a1f14;
+  padding: 10px 8px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.03);
+  height: 100%;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-ad-content {
+  text-align: center;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-ad-content h4 {
+  font-family: "Rye", serif;
+  font-size: 1em;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  margin: 0 0 6px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-ad-content p {
+  font-size: 0.82em;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content h4 {
+  font-size: 0.9em;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-slot--filler-ad .dc-newspaper-ad-content p {
+  font-size: 0.75em;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-colophon {
+  font-size: 0.78em;
+  text-align: center;
+  color: #4a3728;
+  font-style: italic;
+  padding-top: 8px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-masthead__name {
+  width: 100%;
+  text-align: center;
+  font-family: "UnifrakturMaguntia", "Times New Roman", serif;
+  font-size: 2.8em;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  border: 1px dashed transparent;
+  background: transparent;
+  color: #3d2914;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-masthead__name:focus {
+  border-color: var(--color-border-highlight, #999);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-dateline {
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-dateline__field {
+  border: 1px dashed transparent;
+  background: transparent;
+  text-align: center;
+  min-width: 80px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-dateline__field:focus {
+  border-color: var(--color-border-highlight, #999);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-main-headline {
+  width: 100%;
+  font-family: "Rye", serif;
+  font-size: 1.8em;
+  font-weight: normal;
+  text-align: center;
+  margin: 4px 0 10px;
+  letter-spacing: 0.03em;
+  color: #3d2914;
+  border: 1px dashed transparent;
+  background: transparent;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-main-headline:focus {
+  border-color: var(--color-border-highlight, #999);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-fragment {
+  width: 100%;
+  height: 100%;
+  min-height: 4em;
+  font-family: "Special Elite", monospace;
+  font-size: 0.95em;
+  line-height: 1.55;
+  text-align: justify;
+  border: 1px dashed transparent;
+  background: transparent;
+  resize: vertical;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-fragment:focus {
+  border-color: var(--color-border-highlight, #999);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot--side {
+  border: 1px dashed var(--color-border-light-2, #ccc);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot--side:hover {
+  border-color: var(--color-border-highlight, #999);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot__toolbar {
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot__badge {
+  font-size: var(--font-size-10, 0.65rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot__actions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.newspaper-editor-sheet-app .dc-side-action {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.newspaper-editor-sheet-app .dc-side-action:hover {
+  opacity: 1;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-headline {
+  width: 100%;
+  font-family: "Rye", serif;
+  font-size: 1.05em;
+  font-weight: normal;
+  text-align: center;
+  border: 1px dashed transparent;
+  background: transparent;
+  margin-bottom: 4px;
+  color: #3d2914;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-body {
+  width: 100%;
+  font-size: 0.88em;
+  line-height: 1.55;
+  text-align: justify;
+  border: 1px dashed transparent;
+  background: transparent;
+  resize: vertical;
+  margin-bottom: 4px;
+  font-family: "Special Elite", monospace;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-continued {
+  width: 100%;
+  font-style: italic;
+  font-size: var(--font-size-12, 0.75rem);
+  border: 1px dashed transparent;
+  background: transparent;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-headline:focus,
+.newspaper-editor-sheet-app .dc-newspaper-editor-body:focus,
+.newspaper-editor-sheet-app .dc-newspaper-editor-continued:focus {
+  border-color: var(--color-border-highlight, #999);
+}
+
+@media (max-width: 900px) {
+  .newspaper-editor-sheet-app .dc-newspaper-body,
+  .newspaper-editor-sheet-app .dc-newspaper-body--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .newspaper-editor-sheet-app .dc-newspaper-col-side-left,
+  .newspaper-editor-sheet-app .dc-newspaper-col-side-right {
+    border: none;
+    border-top: 1px solid #9a7b5b;
+    padding-top: 12px;
+  }
+}
+
+/* ── Newspaper editor: 3-column shell + palette drag-drop ── */
+
+.newspaper-editor-sheet-app .window-content {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-sheet {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-body.editor-shell {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.newspaper-editor-sheet-app .editor-shell-3col {
+  display: grid;
+  grid-template-columns: 220px 1fr 260px;
+}
+
+.newspaper-editor-sheet-app .editor-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--color-border-faint);
+  background: var(--color-bg-option, #f5f0e8);
+}
+
+.newspaper-editor-sheet-app .editor-panel:last-child {
+  border-right: none;
+}
+
+.newspaper-editor-sheet-app .editor-panel-header {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-faint);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.newspaper-editor-sheet-app .editor-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  min-height: 0;
+}
+
+.newspaper-editor-sheet-app .editor-panel-empty,
+.newspaper-editor-sheet-app .editor-hint {
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.newspaper-editor-sheet-app .editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.newspaper-editor-sheet-app .editor-field label,
+.newspaper-editor-sheet-app .editor-field span {
+  font-size: 0.75em;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.newspaper-editor-sheet-app .editor-add-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 8px;
+  font-size: 0.85em;
+}
+
+.newspaper-editor-sheet-app .editor-add-btn-inline {
+  width: auto;
+  display: inline-flex;
+  margin-right: 6px;
+}
+
+.newspaper-editor-sheet-app .editor-asset-settings {
+  margin-bottom: 8px;
+}
+
+.newspaper-editor-sheet-app .editor-asset-settings summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85em;
+  margin-bottom: 6px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-group {
+  margin-bottom: 10px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-group-label {
+  font-size: 0.7em;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 4px;
+  padding-left: 4px;
+  border-left: 3px solid #8a7355;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 0.75em;
+  border: 1px solid var(--color-border-light-2, #ccc);
+  border-left: 3px solid #8a7355;
+  border-radius: 3px;
+  background: var(--color-bg-option, #fff);
+  cursor: grab;
+  user-select: none;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-chip:active {
+  cursor: grabbing;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-palette-chip.dc-palette-chip-dragging {
+  opacity: 0.4;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot--selected {
+  outline: 2px solid var(--color-border-highlight, #668);
+  outline-offset: 1px;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot.dc-slot-drop-target {
+  box-shadow: inset 0 0 0 2px var(--color-border-highlight, #668);
+  background: rgba(100, 100, 160, 0.08);
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot.dc-slot-dragging {
+  opacity: 0.45;
+}
+
+.newspaper-editor-sheet-app .dc-slot-drag-handle {
+  margin-left: auto;
+  cursor: grab;
+  opacity: 0.6;
+  padding: 2px 4px;
+}
+
+.newspaper-editor-sheet-app .dc-slot-drag-handle:hover {
+  opacity: 1;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-slot__preview {
+  font-size: 0.82em;
+  line-height: 1.45;
+  max-height: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.newspaper-editor-sheet-app .dc-newspaper-editor-empty-slot {
+  text-align: center;
+  padding: 1.5em 0.5em;
+  border: 1px dashed #9a7b5b;
+  border-radius: 4px;
+}
+
+.newspaper-editor-sheet-app .newspaper-editor-scroll {
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.newspaper-editor-sheet-app .newspaper-detail-panel textarea,
+.newspaper-editor-sheet-app .newspaper-detail-panel input[type="text"] {
+  width: 100%;
+  font-family: "Special Elite", monospace;
+}
+
+.dc-custom-fragment-form .editor-field input[type="text"],
+.dc-custom-fragment-form .editor-field textarea {
+  width: 100%;
+}
+
+/* Custom fragment dialog — light parchment theme (matches newspaper editor) */
+.deadlands-classic.dc-custom-fragment-dialog.theme-light .window-content {
+  background: linear-gradient(180deg, #f4ead5 0%, #e8dcc4 100%);
+  color: #2a1f14;
+  font-family: "Special Elite", monospace;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog.theme-light .window-header {
+  background: #5c4033;
+  color: #f4ead5;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog .dc-custom-fragment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog .editor-hint {
+  margin: 0;
+  font-size: 0.85em;
+  color: #5c4033;
+  font-style: italic;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog .editor-field label,
+.deadlands-classic.dc-custom-fragment-dialog .editor-field span {
+  font-size: 0.75em;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog .editor-field input[type="text"],
+.deadlands-classic.dc-custom-fragment-dialog .editor-field textarea {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #9a7b5b;
+  color: #2a1f14;
+  font-family: "Special Elite", monospace;
+}
+
+.deadlands-classic.dc-custom-fragment-dialog .editor-field input[type="text"]:focus,
+.deadlands-classic.dc-custom-fragment-dialog .editor-field textarea:focus {
+  outline: none;
+  border-color: #5c4033;
+  box-shadow: 0 0 0 1px #5c4033;
+}
+
+.dc-custom-fragment-help {
+  margin-top: 4px;
+  min-height: 0;
+}
+
+.dc-custom-fragment-help summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #5c4033;
+}
+
+.dc-custom-fragment-help-scroll {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #9a7b5b;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.dc-custom-fragment-token-group {
+  margin-bottom: 10px;
+}
+
+.dc-custom-fragment-token-group:last-child {
+  margin-bottom: 0;
+}
+
+.dc-custom-fragment-token-group h4 {
+  margin: 0 0 4px;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  color: #5c4033;
+  opacity: 0.85;
+}
+
+.dc-custom-fragment-token-group table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.dc-custom-fragment-token-group td {
+  padding: 2px 4px;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(154, 123, 91, 0.35);
+}
+
+.dc-custom-fragment-token-group code {
+  white-space: nowrap;
+  color: #3d2b1f;
+}
+
+/* Fragment pool editor */
+.dc-fragment-pool-editor .dc-pool-editor-selectors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dc-pool-editor-entries {
+  margin-bottom: 10px;
+}
+
+.dc-pool-editor-entries-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #3d2b1f;
+}
+
+.dc-pool-editor-count {
+  font-weight: 400;
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+
+.dc-pool-editor-entry-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid rgba(154, 123, 91, 0.45);
+  border-radius: 4px;
+  background: rgba(255, 252, 245, 0.85);
+}
+
+.dc-pool-editor-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border: none;
+  border-bottom: 1px solid rgba(154, 123, 91, 0.25);
+  background: transparent;
+  cursor: pointer;
+  color: #3d2b1f;
+  font: inherit;
+}
+
+.dc-pool-editor-entry:last-child {
+  border-bottom: none;
+}
+
+.dc-pool-editor-entry:hover {
+  background: rgba(154, 123, 91, 0.12);
+}
+
+.dc-pool-editor-entry.selected {
+  background: rgba(154, 123, 91, 0.22);
+}
+
+.dc-pool-editor-entry-preview {
+  flex: 1;
+  line-height: 1.35;
+}
+
+.dc-pool-editor-entry-badge {
+  flex-shrink: 0;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(90, 60, 30, 0.15);
+  color: #5a3c1e;
+}
+
+.dc-pool-editor-empty {
+  padding: 8px;
+  margin: 0;
+}
+
+.dc-pool-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.dc-pool-editor-actions .editor-add-btn[disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.dc-value-list-format-hint {
+  margin: 0 0 8px;
+  font-size: 0.9em;
+}
+
+/* ─── Document category editors ─────────────────────────────────────────── */
+
+.deadlands-classic.document-editor-sheet-app .document-editor-sheet.flexcol {
+  height: 100%;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-sheet .document-editor-scroll {
+  flex: 1;
+  overflow: auto;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-scroll {
+  padding: 8px 12px;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-footer {
+  padding: 8px 12px;
+  gap: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.deadlands-classic.document-editor-sheet-app .form-group {
+  margin-bottom: 10px;
+}
+
+.deadlands-classic.document-editor-sheet-app .form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.deadlands-classic.document-editor-sheet-app input[type="text"],
+.deadlands-classic.document-editor-sheet-app textarea,
+.deadlands-classic.document-editor-sheet-app select {
+  width: 100%;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-preview-panel {
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px solid rgba(90, 60, 30, 0.25);
+  background: rgba(255, 248, 230, 0.5);
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-entry {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px dashed rgba(90, 60, 30, 0.3);
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-ledger-table {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-ledger-table input {
+  width: 100%;
+}
+
+.deadlands-classic.document-editor-sheet-app .map-editor-preview {
+  position: relative;
+  margin: 8px 0;
+  min-height: 200px;
+  border: 1px solid rgba(90, 60, 30, 0.3);
+  cursor: crosshair;
+}
+
+.deadlands-classic.document-editor-sheet-app .map-editor-preview-img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.deadlands-classic.document-editor-sheet-app .map-editor-marker {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  color: #8b0000;
+}
+
+.deadlands-classic.document-editor-sheet-app .sourcebook-preview-iframe,
+.deadlands-classic.document-editor-sheet-app .web-page-preview-iframe {
+  width: 100%;
+  height: 280px;
+  border: none;
+}
+
+.deadlands-classic.document-editor-sheet-app .wanted-poster-portrait-preview {
+  display: block;
+  max-width: 128px;
+  max-height: 128px;
+  margin-top: 8px;
+}
+
+.deadlands-classic .editor-form-table .editor-open-document {
+  margin-left: 6px;
+}
+
+/* ─── Wanted poster reader ──────────────────────────────────────────────── */
+
+.deadlands-classic.document-sheet .dc-wanted-poster,
+.deadlands-classic .viewer-text-content .dc-wanted-poster {
+  text-align: center;
+  padding: 16px;
+  background: #f4e8c1;
+  border: 3px double #5a3c1e;
+  font-family: "Roboto Slab", serif;
+}
+
+.deadlands-classic .dc-wanted-banner {
+  font-size: 2.4em;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  margin: 0;
+}
+
+.deadlands-classic .dc-wanted-sub {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 4px 0;
+}
+
+.deadlands-classic .dc-wanted-body {
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.deadlands-classic .dc-wanted-portrait {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border: 2px solid #5a3c1e;
+}
+
+.deadlands-classic .dc-wanted-name {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.deadlands-classic .dc-wanted-reward {
+  font-size: 1.6em;
+  font-weight: bold;
+  margin: 8px 0 0;
+}
+
+.deadlands-classic .dc-wanted-reward-label {
+  font-weight: bold;
+  letter-spacing: 0.15em;
+}
+
+.deadlands-classic .dc-wanted-footer,
+.deadlands-classic .dc-wanted-contact {
+  font-size: 0.85em;
+  margin-top: 8px;
+}
+
+/* ─── Letter reader ─────────────────────────────────────────────────────── */
+
+.deadlands-classic .dc-letter {
+  padding: 20px 24px;
+  font-family: "Baskervville", serif;
+  line-height: 1.5;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter,
+.deadlands-classic .viewer-text-content .dc-letter {
+  background: transparent;
+  border: none;
+  padding: 0;
+  max-width: none;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter--formal,
+.deadlands-classic .viewer-text-content .dc-letter--formal {
+  font-family: "Baskervville", serif;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter--telegram,
+.deadlands-classic .viewer-text-content .dc-letter--telegram {
+  font-family: "Special Elite", monospace;
+  background: #f8f4e8;
+  border: 1px solid #999;
+  padding: 16px 20px;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter--handwritten,
+.deadlands-classic .viewer-text-content .dc-letter--handwritten {
+  font-family: "Corinthia", cursive;
+  font-size: 1.85em;
+  line-height: 1.35;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter--handwritten p,
+.deadlands-classic .viewer-text-content .dc-letter--handwritten p {
+  text-indent: 0;
+}
+
+.deadlands-classic .dc-letter-signature {
+  margin-top: 16px;
+  font-style: italic;
+}
+
+.deadlands-classic.document-sheet .document-reader--letter .document-text .dc-letter--handwritten .dc-letter-signature,
+.deadlands-classic .viewer-text-content .dc-letter--handwritten .dc-letter-signature {
+  font-family: "Corinthia", cursive;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1.1em;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-preview-panel .dc-letter--handwritten,
+.deadlands-classic.document-editor-sheet-app .document-editor-preview-panel .dc-letter--handwritten p {
+  font-family: "Corinthia", cursive;
+  font-size: 1.85em;
+  line-height: 1.35;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-preview-panel .dc-letter--telegram {
+  font-family: "Special Elite", monospace;
+}
+
+.deadlands-classic.document-editor-sheet-app .document-editor-preview-panel .dc-letter--formal {
+  font-family: "Baskervville", serif;
+}
+
+/* Letter item viewer — override typed-* sheet font inheritance */
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten p,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten .dc-letter-body,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten .dc-letter-body p,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten .dc-letter-signature {
+  font-family: "Corinthia", cursive;
+  font-size: 1.85em;
+  line-height: 1.35;
+}
+
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--handwritten .dc-letter-signature {
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1.1em;
+}
+
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--telegram,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--telegram p {
+  font-family: "Special Elite", monospace;
+  font-size: 1rem;
+}
+
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--formal,
+.deadlands-classic.item-viewer-sheet .viewer-document-preview .document-text .dc-letter--formal p {
+  font-family: "Baskervville", serif;
+  font-size: 1rem;
+}
+
+/* ─── Journal reader ────────────────────────────────────────────────────── */
+
+.deadlands-classic .dc-journal {
+  padding: 16px 20px;
+}
+
+.deadlands-classic .dc-journal-entry {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(90, 60, 30, 0.2);
+}
+
+.deadlands-classic .dc-journal-entry-date {
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* ─── Ledger reader ─────────────────────────────────────────────────────── */
+
+.deadlands-classic .dc-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.deadlands-classic .dc-ledger-table th,
+.deadlands-classic .dc-ledger-table td {
+  border: 1px solid rgba(90, 60, 30, 0.3);
+  padding: 4px 8px;
+}
+
+.deadlands-classic .dc-ledger-table th {
+  background: rgba(90, 60, 30, 0.1);
+}
+
+/* ─── Map reader ────────────────────────────────────────────────────────── */
+
+.deadlands-classic .dc-map-image-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.deadlands-classic .dc-map-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.deadlands-classic .dc-map-marker {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  color: #8b0000;
+  font-size: 1.2em;
+}
+
+.deadlands-classic .dc-map-marker-label {
+  display: block;
+  font-size: 0.75em;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1px 4px;
+}
+
+/* ─── Other document reader ─────────────────────────────────────────────── */
+
+.deadlands-classic .dc-other--notice .dc-other-title,
+.deadlands-classic .dc-other--proclamation .dc-other-title {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.deadlands-classic .dc-other--proclamation {
+  border: 2px double #5a3c1e;
+  padding: 16px;
+  background: #f4e8c1;
 }

@@ -14,108 +14,132 @@
 	{{/if}}
 	<hr class="dc-newspaper-rule">
 
-	<div class="dc-newspaper-body">
-		<div class="dc-newspaper-col dc-newspaper-col-side-left">
-			{{#each advertisements}}
-				{{#if (eq this.column "left")}}
-					<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
-						{{#if this.title}}
-							<div class="dc-newspaper-ad-content">
-								<h4>{{this.title}}</h4>
-								{{#each this.lines}}
-									<p>{{this}}</p>
-								{{/each}}
-								{{#if this.note}}
-									<p><em>{{this.note}}</em></p>
-								{{/if}}
-							</div>
-						{{else}}
-							<p>[Advertisement]</p>
-						{{/if}}
-					</div>
-				{{/if}}
-			{{/each}}
-
-			{{#each side_articles}}
-				{{#if (eq (math @index "%" 2) 0)}}
-					<div class="dc-newspaper-sub-article">
-						{{#if this.headline}}
-							<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
-						{{else}}
-							<h3 class="dc-newspaper-sub-headline">[Side Article]</h3>
-						{{/if}}
-						<div class="dc-newspaper-article-body">
-							{{#each this.paragraphs}}
-								<p>{{this}}</p>
-							{{/each}}
-							{{#if this.editor}}
-								<p class="dc-newspaper-editorial">— Editorial by {{this.editor}}</p>
-							{{/if}}
-							{{#if this.continued}}
-								<p class="dc-newspaper-continued">{{this.continued}}</p>
-							{{/if}}
-						</div>
-					</div>
-				{{/if}}
-			{{/each}}
-		</div>
-
-		<div class="dc-newspaper-col dc-newspaper-col-main" data-columns="{{columns}}">
-			<div class="dc-newspaper-main-article dc-newspaper-cols-{{#if columns}}{{columns}}{{else}}2{{/if}}">
-				{{#each main_article.paragraphs}}
-					<p>{{this}}</p>
+	{{#if layout}}
+		<div class="dc-newspaper-body dc-newspaper-body--grid" data-center-cols="{{layout.center_columns}}" style="--dc-newspaper-center-cols: {{layout.center_columns}};">
+			<div class="dc-newspaper-col dc-newspaper-col-side-left dc-newspaper-col-slots">
+				{{#each layout.columns.left}}
+					{{> "modules/dc-containers/templates/documents/newspaper_slot.hbs" this}}
 				{{/each}}
-				{{#if main_article.editor}}
-					<p class="dc-newspaper-editorial">— Editorial by {{main_article.editor}}</p>
-				{{/if}}
+			</div>
+
+			{{#each layout.columns.center}}
+				<div class="dc-newspaper-col dc-newspaper-col-main dc-newspaper-col-slots">
+					{{#each this}}
+						{{> "modules/dc-containers/templates/documents/newspaper_slot.hbs" this}}
+					{{/each}}
+				</div>
+			{{/each}}
+
+			<div class="dc-newspaper-col dc-newspaper-col-side-right dc-newspaper-col-slots">
+				{{#each layout.columns.right}}
+					{{> "modules/dc-containers/templates/documents/newspaper_slot.hbs" this}}
+				{{/each}}
 			</div>
 		</div>
-
-		<div class="dc-newspaper-col dc-newspaper-col-side-right">
-			{{#each side_articles}}
-				{{#if (eq (math @index "%" 2) 1)}}
-					<div class="dc-newspaper-sub-article">
-						{{#if this.headline}}
-							<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
-						{{else}}
-							<h3 class="dc-newspaper-sub-headline">[Side Article]</h3>
-						{{/if}}
-						<div class="dc-newspaper-article-body">
-							{{#each this.paragraphs}}
-								<p>{{this}}</p>
-							{{/each}}
-							{{#if this.editor}}
-								<p class="dc-newspaper-editorial">— Editorial by {{this.editor}}</p>
-							{{/if}}
-							{{#if this.continued}}
-								<p class="dc-newspaper-continued">{{this.continued}}</p>
+	{{else}}
+		<div class="dc-newspaper-body">
+			<div class="dc-newspaper-col dc-newspaper-col-side-left">
+				{{#each advertisements}}
+					{{#if (eq this.column "left")}}
+						<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
+							{{#if this.title}}
+								<div class="dc-newspaper-ad-content">
+									<h4>{{{this.title}}}</h4>
+									{{#each this.lines}}
+										<p>{{{this}}}</p>
+									{{/each}}
+									{{#if this.note}}
+										<p><em>{{{this.note}}}</em></p>
+									{{/if}}
+								</div>
+							{{else}}
+								<p>[Advertisement]</p>
 							{{/if}}
 						</div>
-					</div>
-				{{/if}}
-			{{/each}}
+					{{/if}}
+				{{/each}}
 
-			{{#each advertisements}}
-				{{#if (eq this.column "right")}}
-					<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
-						{{#if this.title}}
-							<div class="dc-newspaper-ad-content">
-								<h4>{{this.title}}</h4>
-								{{#each this.lines}}
+				{{#each side_articles}}
+					{{#if (eq (math @index "%" 2) 0)}}
+						<div class="dc-newspaper-sub-article">
+							{{#if this.headline}}
+								<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
+							{{else}}
+								<h3 class="dc-newspaper-sub-headline">[Side Article]</h3>
+							{{/if}}
+							<div class="dc-newspaper-article-body">
+								{{#each this.paragraphs}}
 									<p>{{this}}</p>
 								{{/each}}
-								{{#if this.note}}
-									<p><em>{{this.note}}</em></p>
+								{{#if this.editor}}
+									<p class="dc-newspaper-editorial">— Editorial by {{this.editor}}</p>
+								{{/if}}
+								{{#if this.continued}}
+									<p class="dc-newspaper-continued">{{this.continued}}</p>
 								{{/if}}
 							</div>
-						{{else}}
-							<p>[Advertisement]</p>
-						{{/if}}
-					</div>
-				{{/if}}
-			{{/each}}
+						</div>
+					{{/if}}
+				{{/each}}
+			</div>
+
+			<div class="dc-newspaper-col dc-newspaper-col-main" data-columns="{{columns}}">
+				<div class="dc-newspaper-main-article dc-newspaper-cols-{{#if columns}}{{columns}}{{else}}2{{/if}}">
+					{{#each main_article.paragraphs}}
+						<p>{{this}}</p>
+					{{/each}}
+					{{#if main_article.editor}}
+						<p class="dc-newspaper-editorial">— Editorial by {{main_article.editor}}</p>
+					{{/if}}
+				</div>
+			</div>
+
+			<div class="dc-newspaper-col dc-newspaper-col-side-right">
+				{{#each side_articles}}
+					{{#if (eq (math @index "%" 2) 1)}}
+						<div class="dc-newspaper-sub-article">
+							{{#if this.headline}}
+								<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
+							{{else}}
+								<h3 class="dc-newspaper-sub-headline">[Side Article]</h3>
+							{{/if}}
+							<div class="dc-newspaper-article-body">
+								{{#each this.paragraphs}}
+									<p>{{this}}</p>
+								{{/each}}
+								{{#if this.editor}}
+									<p class="dc-newspaper-editorial">— Editorial by {{this.editor}}</p>
+								{{/if}}
+								{{#if this.continued}}
+									<p class="dc-newspaper-continued">{{this.continued}}</p>
+								{{/if}}
+							</div>
+						</div>
+					{{/if}}
+				{{/each}}
+
+				{{#each advertisements}}
+					{{#if (eq this.column "right")}}
+						<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
+							{{#if this.title}}
+								<div class="dc-newspaper-ad-content">
+									<h4>{{{this.title}}}</h4>
+									{{#each this.lines}}
+										<p>{{{this}}}</p>
+									{{/each}}
+									{{#if this.note}}
+										<p><em>{{{this.note}}}</em></p>
+									{{/if}}
+								</div>
+							{{else}}
+								<p>[Advertisement]</p>
+							{{/if}}
+						</div>
+					{{/if}}
+				{{/each}}
+			</div>
 		</div>
-	</div>
+	{{/if}}
 
 	<hr class="dc-newspaper-rule">
 	<div class="dc-newspaper-colophon">{{colophon}}</div>
