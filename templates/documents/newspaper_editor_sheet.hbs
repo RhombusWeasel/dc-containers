@@ -1,0 +1,141 @@
+<div class="newspaper-editor-sheet flexcol">
+	<div class="newspaper-editor-toolbar flexrow">
+		<button type="button" data-action="toggleGenerate" class="dc-newspaper-editor-btn">
+			<i class="fas fa-cog"></i> {{labels.generate_options}}
+		</button>
+		<button type="button" data-action="generate" class="dc-newspaper-editor-btn">
+			<i class="fas fa-dice"></i> {{labels.generate}}
+		</button>
+		<button type="button" data-action="suggestHeadline" class="dc-newspaper-editor-btn">
+			<i class="fas fa-heading"></i> {{labels.suggest_headline}}
+		</button>
+		<button type="button" data-action="resetStory" class="dc-newspaper-editor-btn">
+			<i class="fas fa-redo"></i> {{labels.reset_story}}
+		</button>
+		<span class="newspaper-editor-toolbar__spacer"></span>
+		<button type="button" data-action="save" class="dc-newspaper-editor-btn dc-newspaper-editor-btn--primary">
+			<i class="fas fa-check"></i> {{labels.save}}
+		</button>
+		<button type="button" data-action="cancel" class="dc-newspaper-editor-btn">
+			<i class="fas fa-times"></i> {{labels.cancel}}
+		</button>
+	</div>
+
+	<div class="newspaper-editor-generate-panel flexcol{{#unless show_generate_panel}} hidden{{/unless}}">
+		<div class="flexrow newspaper-editor-generate-row">
+			<label class="dl-label" for="gen_mode">{{labels.mode}}</label>
+			<select name="gen_mode" id="gen_mode">
+				<option value="random" {{#if (eq gen_options.mode "random")}}selected{{/if}}>{{labels.mode_random}}</option>
+				<option value="hybrid" {{#if (eq gen_options.mode "hybrid")}}selected{{/if}}>{{labels.mode_hybrid}}</option>
+				<option value="scaffold" {{#if (eq gen_options.mode "scaffold")}}selected{{/if}}>{{labels.mode_scaffold}}</option>
+			</select>
+		</div>
+		<div class="flexrow newspaper-editor-generate-row">
+			<label class="dl-label" for="gen_columns">{{labels.columns}}</label>
+			<select name="gen_columns" id="gen_columns">
+				<option value="2" {{#if (eq gen_options.columns 2)}}selected{{/if}}>2</option>
+				<option value="3" {{#if (eq gen_options.columns 3)}}selected{{/if}}>3</option>
+			</select>
+			<label class="dl-label" for="gen_side">{{labels.side_articles}}</label>
+			<select name="gen_side" id="gen_side">
+				<option value="0" {{#if (eq gen_options.side_articles 0)}}selected{{/if}}>0</option>
+				<option value="2" {{#if (eq gen_options.side_articles 2)}}selected{{/if}}>2</option>
+				<option value="4" {{#if (eq gen_options.side_articles 4)}}selected{{/if}}>4</option>
+				<option value="6" {{#if (eq gen_options.side_articles 6)}}selected{{/if}}>6</option>
+				<option value="8" {{#if (eq gen_options.side_articles 8)}}selected{{/if}}>8</option>
+			</select>
+			<label class="dl-label" for="gen_ads">{{labels.advertisements}}</label>
+			<select name="gen_ads" id="gen_ads">
+				<option value="0" {{#if (eq gen_options.advertisements 0)}}selected{{/if}}>0</option>
+				<option value="1" {{#if (eq gen_options.advertisements 1)}}selected{{/if}}>1</option>
+				<option value="2" {{#if (eq gen_options.advertisements 2)}}selected{{/if}}>2</option>
+			</select>
+		</div>
+		<div class="flexrow newspaper-editor-generate-row">
+			<label class="dl-label" for="gen_seed">{{labels.seed}}</label>
+			<input type="text" name="gen_seed" id="gen_seed" value="{{gen_options.seed}}" placeholder="{{labels.seed_placeholder}}">
+			<label class="dl-label" for="gen_main_lead">{{labels.main_lead}}</label>
+			<select name="gen_main_lead" id="gen_main_lead">
+				<option value="crime" {{#if (eq gen_options.main_lead "crime")}}selected{{/if}}>{{labels.main_lead_crime}}</option>
+				<option value="any" {{#if (eq gen_options.main_lead "any")}}selected{{/if}}>{{labels.main_lead_any}}</option>
+			</select>
+		</div>
+		<div class="flexrow newspaper-editor-generate-row">
+			<label class="dl-label" for="gen_hybrid_headline">{{labels.hybrid_headline}}</label>
+			<input type="text" name="gen_hybrid_headline" id="gen_hybrid_headline" value="{{gen_options.hybrid_headline}}" placeholder="{{labels.hybrid_headline_placeholder}}">
+		</div>
+		<div class="flexrow newspaper-editor-generate-row">
+			<label class="dl-label" for="gen_hybrid_body">{{labels.hybrid_body}}</label>
+			<textarea name="gen_hybrid_body" id="gen_hybrid_body" rows="2" placeholder="{{labels.hybrid_body_placeholder}}">{{gen_options.hybrid_body}}</textarea>
+		</div>
+	</div>
+
+	<div class="newspaper-editor-body editor-shell editor-shell-3col">
+		<aside class="editor-panel editor-panel-assets">
+			<header class="editor-panel-header">{{labels.palette_title}}</header>
+			<div class="editor-panel-body">
+				{{> newspaper-asset-panel}}
+			</div>
+		</aside>
+
+		<section class="editor-panel editor-panel-structure">
+			<header class="editor-panel-header">
+				<span>{{labels.paper_layout}}</span>
+			</header>
+			<div class="editor-panel-body newspaper-editor-scroll">
+				<div class="scroll dc-newspaper dc-newspaper-editor-preview">
+					<div class="dc-newspaper-masthead dc-newspaper-editor-masthead">
+						<input type="text" name="paper_name" class="dc-newspaper-editor-masthead__name" value="{{paper_name}}">
+						<div class="dc-newspaper-dateline dc-newspaper-editor-dateline flexrow">
+							<input type="text" name="date" class="dc-newspaper-editor-dateline__field" value="{{date}}" placeholder="{{labels.date}}">
+							<input type="text" name="price" class="dc-newspaper-editor-dateline__field" value="{{price}}" placeholder="{{labels.price}}">
+							<span class="dc-newspaper-edition">Vol. {{volume}}, No. {{issue}}</span>
+						</div>
+					</div>
+					<hr class="dc-newspaper-rule dc-newspaper-rule--double">
+
+					<input type="text" name="main_headline" class="dc-newspaper-editor-main-headline" value="{{main_article.headline}}" placeholder="{{labels.main_headline}}">
+
+					<hr class="dc-newspaper-rule">
+
+					{{#if layout}}
+						<input type="hidden" name="columns" value="{{columns}}">
+						<div class="dc-newspaper-body dc-newspaper-body--grid" data-center-cols="{{layout.center_columns}}" style="--dc-newspaper-center-cols: {{layout.center_columns}};">
+							<div class="dc-newspaper-col dc-newspaper-col-side-left dc-newspaper-col-slots">
+								{{#each layout.columns.left}}
+									{{> newspaper-editor-slot this}}
+								{{/each}}
+							</div>
+
+							{{#each layout.columns.center}}
+								<div class="dc-newspaper-col dc-newspaper-col-main dc-newspaper-col-slots" data-center-col="{{@index}}">
+									{{#each this}}
+										{{> newspaper-editor-slot this center_col=@../index center_row=@index}}
+									{{/each}}
+								</div>
+							{{/each}}
+
+							<div class="dc-newspaper-col dc-newspaper-col-side-right dc-newspaper-col-slots">
+								{{#each layout.columns.right}}
+									{{> newspaper-editor-slot this}}
+								{{/each}}
+							</div>
+						</div>
+					{{/if}}
+
+					{{#if colophon}}
+						<hr class="dc-newspaper-rule">
+						<div class="dc-newspaper-colophon">{{colophon}}</div>
+					{{/if}}
+				</div>
+			</div>
+		</section>
+
+		<section class="editor-panel editor-panel-detail">
+			<header class="editor-panel-header">{{labels.detail_title}}</header>
+			<div class="editor-panel-body">
+				{{> newspaper-detail-panel}}
+			</div>
+		</section>
+	</div>
+</div>

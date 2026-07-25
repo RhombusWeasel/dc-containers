@@ -1,0 +1,33 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.other_title"}}</label>
+    <input type="text" name="title" value="{{doc_data.title}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.other_style"}}</label>
+    <select name="style">
+      <option value="plain" {{#if (eq doc_data.style "plain")}}selected{{/if}}>{{localize "dc.containers.doc.other_style_plain"}}</option>
+      <option value="notice" {{#if (eq doc_data.style "notice")}}selected{{/if}}>{{localize "dc.containers.doc.other_style_notice"}}</option>
+      <option value="proclamation" {{#if (eq doc_data.style "proclamation")}}selected{{/if}}>{{localize "dc.containers.doc.other_style_proclamation"}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.other_body"}}</label>
+    <textarea name="body" rows="10">{{doc_data.body}}</textarea>
+  </div>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

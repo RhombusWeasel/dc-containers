@@ -1,0 +1,15 @@
+<div class="dc-map">
+  {{#if title}}<h2 class="dc-map-title">{{title}}</h2>{{/if}}
+  {{#if scale_label}}<p class="dc-map-scale">{{scale_label}}</p>{{/if}}
+  <div class="dc-map-image-wrap">
+    {{#if image}}
+    <img class="dc-map-image" src="{{image}}" alt="{{title}}" />
+    {{#each markers as |marker|}}
+    <span class="dc-map-marker" style="left: {{marker.x_pct}}%; top: {{marker.y_pct}}%;" title="{{marker.label}}">
+      <i class="fas {{marker.icon}}"></i>
+      {{#if marker.label}}<span class="dc-map-marker-label">{{marker.label}}</span>{{/if}}
+    </span>
+    {{/each}}
+    {{/if}}
+  </div>
+</div>

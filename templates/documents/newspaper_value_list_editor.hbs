@@ -1,0 +1,77 @@
+<div class="dc-custom-fragment-form dc-fragment-pool-editor dc-value-list-editor">
+  <p class="editor-hint">{{labels.intro}}</p>
+
+  <div class="dc-pool-editor-selectors">
+    <label class="editor-field">
+      <span>{{labels.category}}</span>
+      <select name="category" data-action="changeCategory">
+        {{#each categories}}
+        <option value="{{this.id}}" {{#if (eq ../category this.id)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+
+    <label class="editor-field">
+      <span>{{labels.list}}</span>
+      <select name="list_id" data-action="changeList">
+        {{#each lists}}
+        <option value="{{this.id}}" {{#if (eq ../list_id this.id)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+
+    {{#if show_parent}}
+    <label class="editor-field">
+      <span>{{parent_label}}</span>
+      <select name="parent_id" data-action="changeParent">
+        {{#each parents}}
+        <option value="{{this.id}}" {{#if (eq ../parent_id this.id)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+    {{/if}}
+  </div>
+
+  {{#if format_hint}}
+  <p class="editor-hint dc-value-list-format-hint">{{format_hint}}</p>
+  {{/if}}
+
+  <div class="dc-pool-editor-entries">
+    <div class="dc-pool-editor-entries-header">
+      <span>{{labels.entries}}</span>
+      <span class="dc-pool-editor-count">{{entry_count}}</span>
+    </div>
+    <div class="dc-pool-editor-entry-list">
+      {{#if entries.length}}
+      {{#each entries}}
+      <button type="button" class="dc-pool-editor-entry {{#if this.selected}}selected{{/if}}" data-action="selectEntry" data-index="{{this.index}}">
+        <span class="dc-pool-editor-entry-preview">{{this.preview}}</span>
+        {{#if this.custom}}<span class="dc-pool-editor-entry-badge">{{../labels.custom_badge}}</span>{{/if}}
+      </button>
+      {{/each}}
+      {{else}}
+      <p class="editor-hint dc-pool-editor-empty">{{labels.no_entries}}</p>
+      {{/if}}
+    </div>
+  </div>
+
+  <label class="editor-field">
+    <span>{{labels.value}}</span>
+    <textarea name="value_text" rows="4" placeholder="{{value_placeholder}}">{{value_text}}</textarea>
+  </label>
+
+  <div class="dc-pool-editor-actions">
+    <button type="button" class="editor-add-btn" data-action="saveEntry">
+      <i class="fas fa-save"></i> {{labels.save}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="newEntry">
+      <i class="fas fa-plus"></i> {{labels.new_entry}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="deleteEntry" {{#unless can_delete}}disabled{{/unless}}>
+      <i class="fas fa-trash"></i> {{labels.delete}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="resetList" {{#unless has_override}}disabled{{/unless}}>
+      <i class="fas fa-undo"></i> {{labels.reset_list}}
+    </button>
+  </div>
+</div>

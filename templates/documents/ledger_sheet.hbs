@@ -1,0 +1,26 @@
+<div class="dc-ledger">
+  {{#if account_name}}<h2 class="dc-ledger-title">{{account_name}}</h2>{{/if}}
+  {{#if period}}<p class="dc-ledger-period">{{period}}</p>{{/if}}
+  <table class="dc-ledger-table">
+    <thead>
+      <tr>
+        <th>{{localize "dc.containers.doc.date"}}</th>
+        <th>{{localize "dc.containers.doc.ledger_description"}}</th>
+        <th class="right">{{localize "dc.containers.doc.ledger_debit"}}</th>
+        <th class="right">{{localize "dc.containers.doc.ledger_credit"}}</th>
+        <th class="right">{{localize "dc.containers.doc.ledger_balance"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rows as |row|}}
+      <tr>
+        <td>{{row.date}}</td>
+        <td>{{row.description}}</td>
+        <td class="right">{{#if row.debit}}{{../currency_label}}{{row.debit}}{{/if}}</td>
+        <td class="right">{{#if row.credit}}{{../currency_label}}{{row.credit}}{{/if}}</td>
+        <td class="right">{{../currency_label}}{{row.balance}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

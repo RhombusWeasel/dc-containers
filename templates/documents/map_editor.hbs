@@ -1,0 +1,54 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.map_title"}}</label>
+    <input type="text" name="title" value="{{doc_data.title}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.map_scale"}}</label>
+    <input type="text" name="scale_label" value="{{doc_data.scale_label}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.image"}}</label>
+    <div class="flexrow">
+      <input type="text" name="image" value="{{doc_data.image}}" class="flex1" />
+      <button type="button" data-action="pickImage"><i class="fas fa-image"></i> {{localize "dc.containers.doc.map_pick_image"}}</button>
+    </div>
+  </div>
+
+  <p class="notes">{{localize "dc.containers.doc.map_click_hint"}}</p>
+  <div class="map-editor-preview">
+    {{#if doc_data.image}}
+    <img class="map-editor-preview-img" src="{{doc_data.image}}" alt="{{doc_data.title}}" />
+    {{#each doc_data.markers as |marker index|}}
+    <span class="map-editor-marker" style="left: {{marker.x_pct}}%; top: {{marker.y_pct}}%;"><i class="fas {{marker.icon}}"></i></span>
+    {{/each}}
+    {{else}}
+    <div class="document-placeholder"><i class="fas fa-map"></i></div>
+    {{/if}}
+  </div>
+
+  {{#each doc_data.markers as |marker index|}}
+  <div class="flexrow map-marker-row">
+    <span>{{marker.x_pct}}%, {{marker.y_pct}}%</span>
+    <input type="text" name="marker_label_{{index}}" value="{{marker.label}}" placeholder="{{localize "dc.containers.doc.map_marker_label"}}" class="flex1" />
+    <input type="text" name="marker_icon_{{index}}" value="{{marker.icon}}" placeholder="fa-location-dot" />
+    <button type="button" data-action="removeMarker" data-index="{{index}}"><i class="fas fa-trash"></i></button>
+  </div>
+  {{/each}}
+  <button type="button" data-action="addMarker"><i class="fas fa-plus"></i> {{localize "dc.containers.doc.map_add_marker"}}</button>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

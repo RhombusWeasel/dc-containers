@@ -1,0 +1,65 @@
+<div class="newspaper-asset-panel">
+	<details class="editor-asset-settings" open>
+		<summary>{{labels.palette_title}}</summary>
+		<p class="editor-hint">{{labels.palette_hint}}</p>
+		<div class="dc-newspaper-palette">
+			{{#each palette_groups}}
+			<div class="dc-newspaper-palette-group">
+				<div class="dc-newspaper-palette-group-label">{{this.label}}</div>
+				<div class="dc-newspaper-palette-chips">
+					{{#each this.items}}
+					<div class="dc-newspaper-palette-chip dc-palette-stripe-{{../id}}" data-palette-id="{{this.id}}" draggable="true">
+						<i class="fas {{this.icon}}"></i>
+						<span>{{this.label}}</span>
+					</div>
+					{{/each}}
+				</div>
+			</div>
+			{{/each}}
+
+			{{#if custom_fragments.length}}
+			<div class="dc-newspaper-palette-group">
+				<div class="dc-newspaper-palette-group-label">{{labels.palette_custom}}</div>
+				<div class="dc-newspaper-palette-chips">
+					{{#each custom_fragments}}
+					<div class="dc-newspaper-palette-chip dc-palette-stripe-custom" data-palette-id="custom:{{this.id}}" data-custom-fragment-id="{{this.id}}" draggable="true" title="{{@root.labels.edit_custom_fragment}}">
+						<i class="fas fa-pen"></i>
+						<span>{{this.label}}</span>
+					</div>
+					{{/each}}
+				</div>
+			</div>
+			{{/if}}
+		</div>
+	</details>
+
+	<button type="button" data-action="editFragmentPools" class="editor-add-btn">
+		<i class="fas fa-list"></i> {{labels.edit_fragment_pools}}
+	</button>
+
+	<button type="button" data-action="editValueLists" class="editor-add-btn">
+		<i class="fas fa-book"></i> {{labels.edit_value_lists}}
+	</button>
+
+	<details class="editor-asset-settings">
+		<summary>{{labels.grid_settings}}</summary>
+		<label class="editor-field">
+			<span>{{labels.columns}}</span>
+			<select name="grid_columns">
+				<option value="2" {{#if (eq grid_columns 2)}}selected{{/if}}>2</option>
+				<option value="3" {{#if (eq grid_columns 3)}}selected{{/if}}>3</option>
+			</select>
+		</label>
+		<label class="editor-field">
+			<span>{{labels.grid_rows}}</span>
+			<select name="grid_rows">
+				<option value="2" {{#if (eq grid_rows 2)}}selected{{/if}}>2</option>
+				<option value="3" {{#if (eq grid_rows 3)}}selected{{/if}}>3</option>
+				<option value="4" {{#if (eq grid_rows 4)}}selected{{/if}}>4</option>
+			</select>
+		</label>
+		<button type="button" data-action="resizeGrid" class="editor-add-btn editor-add-btn-inline">
+			<i class="fas fa-expand"></i> {{labels.apply_grid}}
+		</button>
+	</details>
+</div>

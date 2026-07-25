@@ -1,0 +1,34 @@
+<div class="container-contents-editor-sheet">
+  <div class="container-contents-editor-summary">{{selected_count}} {{labels.items}}</div>
+
+  <div class="gear-search-bar">
+    <i class="fas fa-search"></i>
+    <input type="text" class="gear-search container-contents-search" placeholder="{{labels.search}}" />
+  </div>
+
+  <div class="container-contents-tree scroll">
+    {{#each sections}}
+    <h4 class="center dc-header">{{this.label}}</h4>
+    <table class="container-gm-table">
+      <tr>
+        <th class="center width-10">{{../labels.qty}}</th>
+        <th>{{../labels.name}}</th>
+        <th>{{../labels.cost}}</th>
+      </tr>
+      {{#each this.items}}
+      <tr class="container-contents-row" data-search="{{this.search}}">
+        <td class="center">
+          <div class="container-qty-stepper">
+            <a class="fas fa-minus container-qty-dec" data-path="{{this.path}}"></a>
+            <span class="container-qty-value" data-path="{{this.path}}">{{this.qty}}</span>
+            <a class="fas fa-plus container-qty-inc" data-path="{{this.path}}"></a>
+          </div>
+        </td>
+        <td class="left">{{this.label}}</td>
+        <td class="right">{{format_currency this.cost}}</td>
+      </tr>
+      {{/each}}
+    </table>
+    {{/each}}
+  </div>
+</div>

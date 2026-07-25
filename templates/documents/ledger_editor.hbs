@@ -1,0 +1,53 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.ledger_account"}}</label>
+    <input type="text" name="account_name" value="{{doc_data.account_name}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.ledger_period"}}</label>
+    <input type="text" name="period" value="{{doc_data.period}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.ledger_currency"}}</label>
+    <input type="text" name="currency_label" value="{{doc_data.currency_label}}" />
+  </div>
+
+  <table class="document-editor-ledger-table">
+    <thead>
+      <tr>
+        <th>{{localize "dc.containers.doc.date"}}</th>
+        <th>{{localize "dc.containers.doc.ledger_description"}}</th>
+        <th>{{localize "dc.containers.doc.ledger_debit"}}</th>
+        <th>{{localize "dc.containers.doc.ledger_credit"}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each doc_data.rows as |row index|}}
+      <tr data-row-index="{{index}}">
+        <td><input type="text" name="row_date_{{index}}" value="{{row.date}}" /></td>
+        <td><input type="text" name="row_desc_{{index}}" value="{{row.description}}" /></td>
+        <td><input type="text" name="row_debit_{{index}}" value="{{row.debit}}" class="right" /></td>
+        <td><input type="text" name="row_credit_{{index}}" value="{{row.credit}}" class="right" /></td>
+        <td><button type="button" data-action="removeRow" data-index="{{index}}"><i class="fas fa-trash"></i></button></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <button type="button" data-action="addRow"><i class="fas fa-plus"></i> {{localize "dc.containers.doc.ledger_add_row"}}</button>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

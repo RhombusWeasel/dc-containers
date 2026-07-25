@@ -1,0 +1,13 @@
+<div class="dc-letter dc-letter--{{stationery}}">
+  {{#if (eq stationery "telegram")}}
+  <div class="dc-letter-telegram-stamp">
+    {{#if date}}<p class="dc-letter-date">{{date}}</p>{{/if}}
+  </div>
+  {{/if}}
+  {{#if recipient}}<p class="dc-letter-recipient">{{recipient}}</p>{{/if}}
+  {{#if salutation}}<p class="dc-letter-salutation">{{salutation}}</p>{{/if}}
+  <div class="dc-letter-body">{{{body_html}}}</div>
+  {{#if closing}}<p class="dc-letter-closing">{{closing}}</p>{{/if}}
+  {{#if signature}}<p class="dc-letter-signature">{{signature}}</p>{{/if}}
+  {{#if date}}{{#unless (eq stationery "telegram")}}<p class="dc-letter-date">{{date}}</p>{{/unless}}{{/if}}
+</div>

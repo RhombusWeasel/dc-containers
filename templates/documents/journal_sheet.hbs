@@ -1,0 +1,11 @@
+<div class="dc-journal">
+  {{#if title}}<h2 class="dc-journal-title">{{title}}</h2>{{/if}}
+  {{#if author}}<p class="dc-journal-author">{{author}}</p>{{/if}}
+  {{#each entries as |entry|}}
+  <article class="dc-journal-entry">
+    {{#if entry.date}}<p class="dc-journal-entry-date">{{entry.date}}</p>{{/if}}
+    {{#if entry.title}}<h3 class="dc-journal-entry-title">{{entry.title}}</h3>{{/if}}
+    <div class="dc-journal-entry-body">{{{entry.body_html}}}</div>
+  </article>
+  {{/each}}
+</div>

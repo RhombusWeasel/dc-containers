@@ -1,0 +1,41 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.journal_title"}}</label>
+    <input type="text" name="title" value="{{doc_data.title}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.journal_author"}}</label>
+    <input type="text" name="author" value="{{doc_data.author}}" />
+  </div>
+
+  <h4>{{localize "dc.containers.doc.journal_entries"}}</h4>
+  {{#each doc_data.entries as |entry index|}}
+  <div class="document-editor-entry" data-entry-index="{{index}}">
+    <div class="flexrow">
+      <input type="text" name="entry_date_{{index}}" value="{{entry.date}}" placeholder="{{localize "dc.containers.doc.date"}}" />
+      <input type="text" name="entry_title_{{index}}" value="{{entry.title}}" placeholder="{{localize "dc.containers.doc.journal_entry_title"}}" class="flex1" />
+      <button type="button" data-action="moveEntryUp" data-index="{{index}}"><i class="fas fa-arrow-up"></i></button>
+      <button type="button" data-action="moveEntryDown" data-index="{{index}}"><i class="fas fa-arrow-down"></i></button>
+      <button type="button" data-action="removeEntry" data-index="{{index}}"><i class="fas fa-trash"></i></button>
+    </div>
+    <textarea name="entry_body_{{index}}" rows="4">{{entry.body}}</textarea>
+  </div>
+  {{/each}}
+
+  <button type="button" data-action="addEntry"><i class="fas fa-plus"></i> {{localize "dc.containers.doc.journal_add_entry"}}</button>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

@@ -1,0 +1,50 @@
+{{#if (eq this.type "main_fragment")}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--main dc-newspaper-editor-slot dc-newspaper-editor-slot--main{{#if this.drop_cap}} dc-newspaper-slot--drop-cap{{/if}}{{#if this.selected}} dc-newspaper-editor-slot--selected{{/if}}"
+		data-slot-zone="center" data-slot-col="{{#if this.slot_ref.col}}{{this.slot_ref.col}}{{else}}{{center_col}}{{/if}}" data-slot-row="{{#if this.slot_ref.row}}{{this.slot_ref.row}}{{else}}{{center_row}}{{/if}}" data-ref-key="{{this.ref_key}}">
+		<div class="dc-newspaper-editor-slot__toolbar flexrow">
+			<span class="dc-newspaper-editor-slot__badge">{{@root.labels.main_fragment}}</span>
+			<a class="dc-slot-drag-handle" data-drag-handle draggable="true" title="{{@root.labels.drag_slot}}"><i class="fas fa-grip-vertical"></i></a>
+		</div>
+		<div class="dc-newspaper-editor-slot__preview">{{#if this.text}}{{this.text}}{{else}}<span class="dc-newspaper-placeholder">{{@root.labels.empty_slot}}</span>{{/if}}</div>
+	</div>
+{{else if (eq this.type "side_article")}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--side dc-newspaper-editor-slot dc-newspaper-editor-slot--side{{#if this.selected}} dc-newspaper-editor-slot--selected{{/if}}"
+		data-slot-zone="{{this.slot_ref.zone}}" data-slot-row="{{this.slot_ref.row}}" data-ref-key="{{this.ref_key}}">
+		<div class="dc-newspaper-editor-slot__toolbar flexrow">
+			<span class="dc-newspaper-editor-slot__badge">{{@root.labels.side_article_badge}}</span>
+			<a class="dc-slot-drag-handle" data-drag-handle draggable="true" title="{{@root.labels.drag_slot}}"><i class="fas fa-grip-vertical"></i></a>
+		</div>
+		<div class="dc-newspaper-sub-article dc-newspaper-editor-slot__preview">
+			{{#if this.headline}}<strong>{{this.headline}}</strong>{{/if}}
+			{{#if this.paragraphs}}{{#each this.paragraphs}}{{#if this}}<p>{{this}}</p>{{/if}}{{/each}}{{/if}}
+			{{#unless this.headline}}{{#unless (lookup this.paragraphs 0)}}<span class="dc-newspaper-placeholder">{{@root.labels.empty_slot}}</span>{{/unless}}{{/unless}}
+		</div>
+	</div>
+{{else if (or (eq this.type "ad") (eq this.type "filler_ad"))}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--ad dc-newspaper-editor-slot dc-newspaper-editor-slot--ad{{#if (eq this.type "filler_ad")}} dc-newspaper-slot--filler-ad{{/if}}{{#if this.selected}} dc-newspaper-editor-slot--selected{{/if}}"
+		data-slot-zone="{{this.slot_ref.zone}}" data-slot-row="{{this.slot_ref.row}}" data-ref-key="{{this.ref_key}}">
+		<div class="dc-newspaper-editor-slot__toolbar flexrow">
+			<span class="dc-newspaper-editor-slot__badge">{{@root.labels.ad_badge}}</span>
+			<a class="dc-slot-drag-handle" data-drag-handle draggable="true" title="{{@root.labels.drag_slot}}"><i class="fas fa-grip-vertical"></i></a>
+		</div>
+		<div class="dc-newspaper-advertisement dc-newspaper-editor-slot__preview">
+			{{#if this.title}}
+				<div class="dc-newspaper-ad-content">
+					<h4>{{{this.title}}}</h4>
+					{{#each this.lines}}<p>{{{this}}}</p>{{/each}}
+					{{#if this.note}}<p><em>{{{this.note}}}</em></p>{{/if}}
+				</div>
+			{{else}}
+				<p class="dc-newspaper-placeholder">{{@root.labels.empty_slot}}</p>
+			{{/if}}
+		</div>
+	</div>
+{{else}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--empty dc-newspaper-editor-slot{{#if this.selected}} dc-newspaper-editor-slot--selected{{/if}}"
+		data-slot-zone="{{this.slot_ref.zone}}"
+		data-slot-row="{{this.slot_ref.row}}"
+		{{#if center_col}}data-slot-col="{{#if this.slot_ref.col}}{{this.slot_ref.col}}{{else}}{{center_col}}{{/if}}"{{/if}}
+		data-ref-key="{{this.ref_key}}">
+		<p class="dc-newspaper-placeholder dc-newspaper-editor-empty-slot">{{@root.labels.empty_slot}}</p>
+	</div>
+{{/if}}

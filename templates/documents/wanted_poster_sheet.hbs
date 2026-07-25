@@ -1,0 +1,15 @@
+<div class="dc-wanted-poster">
+  <p class="dc-wanted-banner">WANTED</p>
+  {{#if crime}}<p class="dc-wanted-sub">{{crime}}</p>{{/if}}
+  <div class="dc-wanted-body flexrow">
+    {{#if details}}<p class="dc-wanted-detail-col">{{details}}</p>{{/if}}
+    {{#if portrait}}
+    <img class="dc-wanted-portrait" src="{{portrait}}" alt="{{name}}" />
+    {{/if}}
+    {{#if description}}<p class="dc-wanted-detail-col">{{description}}</p>{{/if}}
+  </div>
+  {{#if name}}<p class="dc-wanted-name">{{name}}{{#if alias}} aka {{alias}}{{/if}}</p>{{/if}}
+  {{#if reward}}<p class="dc-wanted-reward">{{reward}}</p><p class="dc-wanted-reward-label">REWARD</p>{{/if}}
+  <p class="dc-wanted-footer">THIS NOTICE TAKES PLACE OF ALL PREVIOUS REWARD NOTICES</p>
+  {{#if contact}}<p class="dc-wanted-contact">CONTACT: {{contact}}</p>{{/if}}
+</div>

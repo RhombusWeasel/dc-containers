@@ -1,0 +1,54 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_stationery"}}</label>
+    <select name="stationery">
+      <option value="formal" {{#if (eq doc_data.stationery "formal")}}selected{{/if}}>{{localize "dc.containers.doc.letter_stationery_formal"}}</option>
+      <option value="telegram" {{#if (eq doc_data.stationery "telegram")}}selected{{/if}}>{{localize "dc.containers.doc.letter_stationery_telegram"}}</option>
+      <option value="handwritten" {{#if (eq doc_data.stationery "handwritten")}}selected{{/if}}>{{localize "dc.containers.doc.letter_stationery_handwritten"}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.date"}}</label>
+    <input type="text" name="date" value="{{doc_data.date}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_sender"}}</label>
+    <input type="text" name="sender" value="{{doc_data.sender}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_recipient"}}</label>
+    <input type="text" name="recipient" value="{{doc_data.recipient}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_salutation"}}</label>
+    <input type="text" name="salutation" value="{{doc_data.salutation}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_body"}}</label>
+    <textarea name="body" rows="8">{{body_text}}</textarea>
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_closing"}}</label>
+    <input type="text" name="closing" value="{{doc_data.closing}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.letter_signature"}}</label>
+    <input type="text" name="signature" value="{{doc_data.signature}}" />
+  </div>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="generate"><i class="fas fa-dice"></i> {{localize "dc.containers.doc.letter_generate"}}</button>
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

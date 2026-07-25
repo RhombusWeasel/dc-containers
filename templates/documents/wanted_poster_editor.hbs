@@ -1,0 +1,56 @@
+<div class="document-editor-sheet flexcol">
+<div class="document-editor-scroll">
+  <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
+
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_name"}}</label>
+    <input type="text" name="name" value="{{doc_data.name}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_alias"}}</label>
+    <input type="text" name="alias" value="{{doc_data.alias}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_crime"}}</label>
+    <input type="text" name="crime" value="{{doc_data.crime}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_details"}}</label>
+    <textarea name="details" rows="2">{{doc_data.details}}</textarea>
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_description"}}</label>
+    <textarea name="description" rows="3">{{doc_data.description}}</textarea>
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_reward"}}</label>
+    <input type="text" name="reward" value="{{doc_data.reward}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_contact"}}</label>
+    <input type="text" name="contact" value="{{doc_data.contact}}" />
+  </div>
+  <div class="form-group">
+    <label>{{localize "dc.containers.doc.wanted_poster_portrait"}}</label>
+    <div class="flexrow">
+      <input type="text" name="portrait" value="{{doc_data.portrait}}" class="flex1" />
+      <button type="button" data-action="pickPortrait"><i class="fas fa-image"></i> {{localize "dc.containers.doc.wanted_poster_pick_image"}}</button>
+    </div>
+    {{#if doc_data.portrait}}
+    <img class="wanted-poster-portrait-preview" src="{{doc_data.portrait}}" alt="" />
+    {{/if}}
+  </div>
+
+  {{#if preview_html}}
+  <div class="document-editor-preview-panel">
+    <h4>{{localize "dc.containers.doc.document_preview"}}</h4>
+    <div class="document-text">{{{preview_html}}}</div>
+  </div>
+  {{/if}}
+</div>
+<footer class="document-editor-footer flexrow">
+  <button type="button" data-action="generate"><i class="fas fa-dice"></i> {{localize "dc.containers.doc.wanted_poster_generate"}}</button>
+  <button type="button" data-action="save"><i class="fas fa-save"></i> {{localize "dc.containers.doc.editor_save"}}</button>
+  <button type="button" data-action="cancel">{{localize "dc.containers.doc.editor_cancel"}}</button>
+</footer>
+</div>

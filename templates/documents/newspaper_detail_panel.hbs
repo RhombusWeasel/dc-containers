@@ -1,0 +1,51 @@
+<div class="newspaper-detail-panel" data-selected-ref="{{selected_ref_key}}">
+	{{#if detail.empty}}
+	<p class="editor-panel-empty">{{labels.detail_empty}}</p>
+	{{else if (eq detail.slot_type "main_fragment")}}
+	<div class="editor-field">
+		<label>{{labels.main_fragment}}</label>
+		<textarea name="detail_text" rows="8">{{detail.text}}</textarea>
+	</div>
+	<button type="button" data-action="regenerateSlot" class="editor-add-btn editor-add-btn-inline">
+		<i class="fas fa-dice"></i> {{labels.regenerate_slot}}
+	</button>
+	<button type="button" data-action="clearSlot" class="editor-add-btn editor-add-btn-inline">
+		<i class="fas fa-eraser"></i> {{labels.clear_slot}}
+	</button>
+	{{else if (eq detail.slot_type "side_article")}}
+	<div class="editor-field">
+		<label>{{labels.side_headline}}</label>
+		<input type="text" name="detail_headline" value="{{detail.headline}}">
+	</div>
+	<div class="editor-field">
+		<label>{{labels.side_body}}</label>
+		<textarea name="detail_body" rows="4">{{detail.body}}</textarea>
+	</div>
+	<div class="editor-field">
+		<label>{{labels.side_continued}}</label>
+		<input type="text" name="detail_continued" value="{{detail.continued}}">
+	</div>
+	<button type="button" data-action="regenerateSlot" class="editor-add-btn editor-add-btn-inline">
+		<i class="fas fa-dice"></i> {{labels.regenerate_slot}}
+	</button>
+	<button type="button" data-action="clearSlot" class="editor-add-btn editor-add-btn-inline">
+		<i class="fas fa-eraser"></i> {{labels.clear_slot}}
+	</button>
+	{{else if (eq detail.slot_type "ad")}}
+	<div class="editor-field">
+		<label>{{labels.ad_title}}</label>
+		<input type="text" name="detail_ad_title" value="{{detail.ad_title}}">
+	</div>
+	<div class="editor-field">
+		<label>{{labels.ad_lines}}</label>
+		<textarea name="detail_ad_lines" rows="4">{{detail.ad_lines}}</textarea>
+	</div>
+	<div class="editor-field">
+		<label>{{labels.ad_note}}</label>
+		<input type="text" name="detail_ad_note" value="{{detail.ad_note}}">
+	</div>
+	<button type="button" data-action="clearSlot" class="editor-add-btn editor-add-btn-inline">
+		<i class="fas fa-eraser"></i> {{labels.clear_slot}}
+	</button>
+	{{/if}}
+</div>

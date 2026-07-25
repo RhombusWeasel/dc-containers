@@ -1,0 +1,81 @@
+<div class="dc-custom-fragment-form dc-fragment-pool-editor">
+  <p class="editor-hint">{{labels.intro}}</p>
+
+  <div class="dc-pool-editor-selectors">
+    <label class="editor-field">
+      <span>{{labels.type}}</span>
+      <select name="fragment_type" data-action="changeType">
+        {{#each fragment_types}}
+        <option value="{{this.id}}" {{#if (eq ../fragment_type this.id)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+
+    {{#if show_genre}}
+    <label class="editor-field">
+      <span>{{labels.genre}}</span>
+      <select name="genre" data-action="changeGenre">
+        {{#each genres}}
+        <option value="{{this.id}}" {{#if (eq ../genre this.id)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+    {{/if}}
+
+    <label class="editor-field">
+      <span>{{labels.pool}}</span>
+      <select name="pool_key" data-action="changePool">
+        {{#each pools}}
+        <option value="{{this.key}}" {{#if (eq ../pool_key this.key)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </label>
+  </div>
+
+  <div class="dc-pool-editor-entries">
+    <div class="dc-pool-editor-entries-header">
+      <span>{{labels.entries}}</span>
+      <span class="dc-pool-editor-count">{{entry_count}}</span>
+    </div>
+    <div class="dc-pool-editor-entry-list">
+      {{#if entries.length}}
+      {{#each entries}}
+      <button type="button" class="dc-pool-editor-entry {{#if this.selected}}selected{{/if}}" data-action="selectEntry" data-index="{{this.index}}">
+        <span class="dc-pool-editor-entry-preview">{{this.preview}}</span>
+        {{#if this.custom}}<span class="dc-pool-editor-entry-badge">{{../labels.custom_badge}}</span>{{/if}}
+      </button>
+      {{/each}}
+      {{else}}
+      <p class="editor-hint dc-pool-editor-empty">{{labels.no_entries}}</p>
+      {{/if}}
+    </div>
+  </div>
+
+  <label class="editor-field">
+    <span>{{labels.template}}</span>
+    <textarea name="template_text" rows="6" placeholder="{{labels.placeholder}}">{{template_text}}</textarea>
+  </label>
+
+  <details class="dc-custom-fragment-help">
+    <summary>{{labels.tokens}}</summary>
+    <div class="dc-custom-fragment-help-scroll">
+      <p class="editor-hint">{{labels.tokens_hint}}</p>
+      {{{token_help_html}}}
+    </div>
+  </details>
+
+  <div class="dc-pool-editor-actions">
+    <button type="button" class="editor-add-btn" data-action="saveEntry">
+      <i class="fas fa-save"></i> {{labels.save}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="newEntry">
+      <i class="fas fa-plus"></i> {{labels.new_entry}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="deleteEntry" {{#unless can_delete}}disabled{{/unless}}>
+      <i class="fas fa-trash"></i> {{labels.delete}}
+    </button>
+    <button type="button" class="editor-add-btn editor-add-btn-inline" data-action="resetPool" {{#unless has_override}}disabled{{/unless}}>
+      <i class="fas fa-undo"></i> {{labels.reset_pool}}
+    </button>
+  </div>
+</div>

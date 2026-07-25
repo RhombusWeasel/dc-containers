@@ -1,0 +1,52 @@
+{{#if (eq this.type "main_fragment")}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--main{{#if this.drop_cap}} dc-newspaper-slot--drop-cap{{/if}}">
+		{{#if this.text}}
+			<p>{{this.text}}</p>
+		{{else}}
+			<p class="dc-newspaper-placeholder">[Main story]</p>
+		{{/if}}
+	</div>
+{{else if (eq this.type "side_article")}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--side">
+		<div class="dc-newspaper-sub-article">
+			{{#if this.headline}}
+				<h3 class="dc-newspaper-sub-headline">{{this.headline}}</h3>
+			{{else}}
+				<h3 class="dc-newspaper-sub-headline">[Side Article]</h3>
+			{{/if}}
+			<div class="dc-newspaper-article-body">
+				{{#each this.paragraphs}}
+					<p>{{this}}</p>
+				{{/each}}
+				{{#if this.editor}}
+					<p class="dc-newspaper-editorial">— Editorial by {{this.editor}}</p>
+				{{/if}}
+				{{#if this.continued}}
+					<p class="dc-newspaper-continued">{{this.continued}}</p>
+				{{/if}}
+			</div>
+		</div>
+	</div>
+{{else if (or (eq this.type "ad") (eq this.type "filler_ad"))}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--ad{{#if (eq this.type "filler_ad")}} dc-newspaper-slot--filler-ad{{/if}}">
+		<div class="dc-newspaper-advertisement" data-ad-id="{{this.id}}">
+			{{#if this.title}}
+				<div class="dc-newspaper-ad-content">
+					<h4>{{{this.title}}}</h4>
+					{{#each this.lines}}
+						<p>{{{this}}}</p>
+					{{/each}}
+					{{#if this.note}}
+						<p><em>{{{this.note}}}</em></p>
+					{{/if}}
+				</div>
+			{{else}}
+				<p>[Advertisement]</p>
+			{{/if}}
+		</div>
+	</div>
+{{else}}
+	<div class="dc-newspaper-slot dc-newspaper-slot--empty">
+		<p class="dc-newspaper-placeholder">&nbsp;</p>
+	</div>
+{{/if}}
