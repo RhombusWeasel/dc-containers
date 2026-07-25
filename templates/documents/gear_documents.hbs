@@ -1,0 +1,60 @@
+<section>
+  <div class="center dc-newspaper-subhead">
+    {{localize "dc.containers.doc.header"}}
+    {{#is_gm}}
+      <a class="add-gear center fas fa-plus" data-action="addGear" data-path="documents" title="{{localize 'dc.shared.edit'}} {{localize 'dc.containers.doc.header'}}" /></a>
+    {{/is_gm}}
+  </div>
+  <table>
+    <tr>
+      <th class="sort-list center" data-path="char.gear.documents" data-key="quantity">{{localize "dc.shared.quantity_short"}}</th>
+      <th class="sort-list center" data-path="char.gear.documents" data-key="label">{{localize "dc.shared.name"}}</th>
+      <th class="sort-list center width-10" data-path="char.gear.documents" data-key="category" title="{{localize "dc.shared.category"}}">
+        <i class="fas fa-folder" />
+      </th>
+      <th class="sort-list center width-10" data-path="char.gear.documents" data-key="weight" title="{{localize "dc.shared.weight"}}">
+        <i class="fas fa-weight-hanging" />
+      </th>
+      <th class="sort-list center width-10" data-path="char.gear.documents" data-key="rarity" title="{{localize "dc.shared.rarity"}}">
+        <i class="fas fa-gem" />
+      </th>
+      <th class="sort-list center width-15" data-path="char.gear.documents" data-key="cost" title="{{localize "dc.shared.cost"}}">
+        <i class="fas fa-dollar-sign" />
+      </th>
+      <th class="center width-5" title='{{localize "dc.shared.read"}}'>
+        <i class="fas fa-book-open" />
+      </th>
+      {{#is_gm}}
+      <th class="center width-5" title='{{localize "dc.shared.edit"}}'><i class="fas fa-pen-nib" /></th>
+      <th class="center width-5" title='{{localize "dc.shared.trash"}}'><i class="fas fa-trash" /></th>
+      {{else}}
+      <th class="center width-5" title='{{localize "dc.shared.view"}}'><i class="fas fa-magnifying-glass" /></th>
+      {{/is_gm}}
+    </tr>
+    {{#each actor.system.char.gear.documents as |doc|}}
+      <tr>
+        <td class="center">{{doc.count}}</td>
+        <td class="left">{{doc.label}}</td>
+        <td class="center">{{lookup_localization "dc.containers.doc.categories" doc.category}}</td>
+        <td class="center">{{sum doc.count '*' (sum doc.weight '/' doc.quantity)}}</td>
+        <td class="left">{{lookup_localization "dc.equipment.rarity" doc.rarity}}</td>
+        <td class="right">{{format_currency (sum doc.count '*' (sum doc.cost '/' doc.quantity))}}</td>
+        <td class="center read-document" data-action="useItem" data-path="char.gear.documents" data-key="{{@key}}">
+          <a class="fas fa-book-open" title="{{localize 'dc.shared.read'}} {{doc.label}}" />
+        </td>
+        {{#is_gm}}
+        <td class="center edit-path" data-action="editPath" data-path="char.gear.documents" data-key="{{@key}}">
+          <a class="fas fa-pen-nib" title="{{localize 'dc.shared.edit'}} {{doc.label}}" />
+        </td>
+        <td class="center delete-path" data-action="deletePath" data-path="char.gear.documents.{{@key}}">
+          <a class="fas fa-trash" title="{{localize 'dc.shared.trash'}} {{doc.label}}?" />
+        </td>
+        {{else}}
+        <td class="center view-path" data-action="viewPath" data-path="char.gear.documents" data-key="{{@key}}">
+          <a class="fas fa-magnifying-glass" title="{{localize 'dc.shared.view'}} {{doc.label}}" />
+        </td>
+        {{/is_gm}}
+      </tr>
+    {{/each}}
+  </table>
+</section>

@@ -3,5 +3,48 @@
 	"dc.containers.qty": "Qty",
 	"dc.containers.take": "Take",
 	"dc.containers.take_all": "Take All",
-	"dc.containers.already_looted": "You have already looted this container."
+	"dc.containers.already_looted": "You have already looted this container.",
+
+	"dc.containers.doc": {
+		"reader_title": "Document Reader",
+		"header": "Documents",
+		"content_type": "Content Type",
+		"content_types": {
+			"ia_book": "Internet Archive Book",
+			"url": "Web URL",
+			"text": "Text",
+			"image": "Image",
+			"newspaper": "Newspaper"
+		},
+		"categories": {
+			"sourcebook": "Sourcebook",
+			"journal": "Journal",
+			"ledger": "Ledger",
+			"wanted_poster": "Wanted Poster",
+			"newspaper": "Newspaper",
+			"map": "Map",
+			"letter": "Letter",
+			"other": "Other"
+		},
+		"url": "URL",
+		"image": "Image Path",
+		"text_content": "Text Content",
+		"open_in_archive": "Open on Internet Archive",
+		"no_url": "No URL has been set for this document.",
+		"no_image": "No image has been set for this document.",
+		"no_text": "No text content has been written for this document.",
+		"unknown_type": "Unknown document type.",
+		"generate_newspaper": "Generate Newspaper",
+		"generate_newspaper_dialog": "Generate Newspaper Content",
+		"paper_name": "Newspaper Name",
+		"mode": "Generation Mode",
+		"mode_random": "Fully Random",
+		"mode_hybrid": "Hybrid (custom main article)",
+		"mode_scaffold": "Scaffold (blank layout)",
+		"date": "Date",
+		"columns": "Columns",
+		"side_articles": "Side Articles",
+		"advertisements": "Advertisements",
+		"generate_failed": "Failed to generate newspaper content."
+	}
 }

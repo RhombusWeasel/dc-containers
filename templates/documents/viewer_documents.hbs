@@ -1,0 +1,36 @@
+{{> "systems/Deadlands-Classic/templates/actor/partials/viewer/_header.hbs"}}
+<div class="viewer-stat-row">
+	<div class="viewer-stat-card">
+		<i class="fas fa-folder"></i>
+		<span class="viewer-stat-value">{{lookup_localization "dc.containers.doc.categories" this.data.category}}</span>
+		<span class="viewer-stat-label">{{localize "dc.shared.category"}}</span>
+	</div>
+	<div class="viewer-stat-card">
+		<i class="fas fa-weight-hanging"></i>
+		<span class="viewer-stat-value">{{this.data.weight}}</span>
+		<span class="viewer-stat-label">{{localize "dc.shared.weight"}}</span>
+	</div>
+	<div class="viewer-stat-card">
+		<i class="fas fa-boxes-stacked"></i>
+		<span class="viewer-stat-value">{{this.data.quantity}}</span>
+		<span class="viewer-stat-label">{{localize "dc.shared.quantity"}}</span>
+	</div>
+</div>
+<table class="viewer-detail-table">
+	<tr><td>{{localize "dc.containers.doc.content_type"}}</td><td>{{lookup_localization "dc.containers.doc.content_types" this.data.content_type}}</td></tr>
+	{{#if this.data.url}}
+	<tr><td>{{localize "dc.containers.doc.url"}}</td><td class="typed-small">{{this.data.url}}</td></tr>
+	{{/if}}
+	{{#if this.data.image}}
+	<tr><td>{{localize "dc.containers.doc.image"}}</td><td class="typed-small">{{this.data.image}}</td></tr>
+	{{/if}}
+	<tr><td>{{localize "dc.shared.rarity"}}</td><td>{{resolve_field this.template this.data 'rarity'}}</td></tr>
+</table>
+{{#if this.data.text_content}}
+<div class="viewer-text-content">
+	<h4 class="center">{{localize "dc.containers.doc.text_content"}}</h4>
+	<div class="document-text">{{{this.data.text_content}}}</div>
+</div>
+{{/if}}
+{{> "systems/Deadlands-Classic/templates/actor/partials/viewer/_description.hbs"}}
+{{> "systems/Deadlands-Classic/templates/actor/partials/viewer/_boons.hbs"}}

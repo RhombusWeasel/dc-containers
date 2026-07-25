@@ -11,6 +11,7 @@ import { register_socket } from "./socket.js";
 import { container } from "./lib/container.js";
 import { register_boons } from "./boons/open_container.js";
 import { register as register_container_contents_field } from "./field_types/container_contents.js";
+import { register_documents } from "./documents/register.js";
 
 const MODULE_ID = "dc-containers";
 
@@ -19,6 +20,11 @@ const MODULE_ID = "dc-containers";
 Hooks.once("init", () => {
 	foundry.applications.handlebars.loadTemplates([
 		"modules/dc-containers/templates/container-sheet.hbs",
+		"modules/dc-containers/templates/documents/document_sheet.hbs",
+		"modules/dc-containers/templates/documents/newspaper_sheet.hbs",
+		"modules/dc-containers/templates/documents/gear_documents.hbs",
+		"modules/dc-containers/templates/documents/viewer_documents.hbs",
+		"modules/dc-containers/templates/documents/gm_documents.hbs",
 	]);
 });
 
@@ -33,6 +39,9 @@ Hooks.once("dcReady", () => {
 
 	// Register open_container boon type + template
 	register_boons();
+
+	// Register document system (gear type, GM tab, partials, templates, use handler)
+	register_documents();
 
 	// Expose module API
 	const module_api = game.modules.get(MODULE_ID);

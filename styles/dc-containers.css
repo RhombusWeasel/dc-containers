@@ -89,3 +89,317 @@
 	width: 3.5em;
 	text-align: center;
 }
+/* ─── Document Reader Sheet ─── */
+
+.deadlands-classic .document-sheet .document-reader {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+}
+
+.deadlands-classic .document-sheet .document-iframe {
+  flex: 1;
+  min-height: 400px;
+  background: #fff;
+}
+
+.deadlands-classic .document-sheet .document-ia-footer {
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 0.8em;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.deadlands-classic .document-sheet .document-ia-footer a {
+  color: var(--dc-text-muted, #555);
+  text-decoration: none;
+}
+
+.deadlands-classic .document-sheet .document-ia-footer a:hover {
+  text-decoration: underline;
+}
+
+.deadlands-classic .document-sheet .document-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: auto;
+  padding: 8px;
+}
+
+.deadlands-classic .document-sheet .document-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.deadlands-classic .document-sheet .document-text-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.deadlands-classic .document-sheet .document-text {
+  padding: 16px 24px;
+  font-size: 1.1em;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Newspaper breaks out of the 700px text constraint */
+.deadlands-classic .document-sheet .document-text:has(.dc-newspaper) {
+  max-width: none;
+  padding: 0;
+}
+
+.deadlands-classic .document-sheet .document-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--dc-text-muted, #888);
+  font-size: 1.2em;
+}
+
+.deadlands-classic .document-sheet .document-placeholder i {
+  font-size: 3em;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* Document viewer (item_viewer) text content */
+.deadlands-classic .viewer-text-content .document-text {
+  padding: 8px;
+  font-size: 0.95em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Procedural Newspaper — generated content styling
+ * Rendered inside .document-text (DocumentSheet) and viewer
+ * ───────────────────────────────────────────────────────────── */
+
+.deadlands-classic .dc-newspaper {
+  font-family: 'Times New Roman', Times, serif;
+  color: #1a1a1a;
+  background: #f5f0e1;
+  padding: 24px 32px;
+  border: 2px double #8b7355;
+  max-width: none;
+  margin: 0;
+}
+
+/* Masthead */
+.deadlands-classic .dc-newspaper-masthead {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.deadlands-classic .dc-newspaper-name {
+  font-family: 'Old English Text MT', 'Times New Roman', serif;
+  font-size: 2.8em;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.deadlands-classic .dc-newspaper-dateline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85em;
+  color: #555;
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999;
+  padding: 4px 0;
+  margin-top: 4px;
+}
+
+.deadlands-classic .dc-newspaper-date,
+.deadlands-classic .dc-newspaper-price,
+.deadlands-classic .dc-newspaper-edition {
+  white-space: nowrap;
+}
+
+/* Horizontal rule between sections */
+.deadlands-classic .dc-newspaper-rule {
+  border: none;
+  border-top: 2px solid #1a1a1a;
+  margin: 12px 0;
+}
+
+/* Main headline */
+.deadlands-classic .dc-newspaper-headline {
+  font-family: 'Old English Text MT', 'Times New Roman', serif;
+  font-size: 1.8em;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;
+  margin: 8px 0 12px 0;
+}
+
+/* Main article body (multi-column) */
+.deadlands-classic .dc-newspaper-main-article {
+  font-size: 1em;
+  line-height: 1.7;
+  text-align: justify;
+  column-gap: 24px;
+  column-rule: 1px solid #ccc;
+}
+
+.deadlands-classic .dc-newspaper-main-article p {
+  margin: 0 0 12px 0;
+  text-indent: 1.5em;
+}
+
+.deadlands-classic .dc-newspaper-main-article p:first-child {
+  text-indent: 0;
+}
+
+/* Body: 4-column grid — side | main (2 cols) | side */
+.deadlands-classic .dc-newspaper-body {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr 1fr !important;
+  gap: 0;
+}
+
+.deadlands-classic .dc-newspaper-col {
+  padding: 0 12px;
+}
+
+.deadlands-classic .dc-newspaper-col-side-left {
+  border-right: 1px solid #ccc;
+}
+
+.deadlands-classic .dc-newspaper-col-main {
+  grid-column: 2 / span 2;
+  border-right: 1px solid #ccc;
+}
+
+/* Main article multi-column flow (CSS columns) */
+.deadlands-classic .dc-newspaper-main-article {
+  text-align: justify;
+  line-height: 1.6;
+  column-gap: 24px;
+}
+
+.deadlands-classic .dc-newspaper-cols-2 { column-count: 2; }
+.deadlands-classic .dc-newspaper-cols-3 { column-count: 3; }
+
+.deadlands-classic .dc-newspaper-main-article p {
+  margin: 0 0 10px 0;
+  text-indent: 1.5em;
+  break-inside: avoid-column;
+}
+
+.deadlands-classic .dc-newspaper-main-article p:first-child {
+  text-indent: 0;
+}
+
+/* Sub-articles (side stories) */
+.deadlands-classic .dc-newspaper-sub-article {
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.deadlands-classic .dc-newspaper-sub-headline {
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.3;
+  margin: 0 0 8px 0;
+}
+
+.deadlands-classic .dc-newspaper-article-body {
+  font-size: 0.92em;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.deadlands-classic .dc-newspaper-article-body p {
+  margin: 0 0 8px 0;
+  text-indent: 1.5em;
+}
+
+.deadlands-classic .dc-newspaper-article-body p:first-child {
+  text-indent: 0;
+}
+
+/* Editorial sign-off */
+.deadlands-classic .dc-newspaper-editorial {
+  font-style: italic;
+  font-size: 0.85em;
+  text-align: right;
+  color: #444;
+  margin-top: 4px;
+}
+
+/* "Continued on page X" */
+.deadlands-classic .dc-newspaper-continued {
+  font-style: italic;
+  font-size: 0.85em;
+  text-align: right;
+  color: #555;
+  margin-top: 2px;
+  text-indent: 0;
+}
+
+/* Advertisements (boxed, within panels) */
+.deadlands-classic .dc-newspaper-advertisement {
+  border: 2px solid #1a1a1a;
+  padding: 10px 8px;
+  margin: 0 0 14px 0;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.deadlands-classic .dc-newspaper-ad-content {
+  text-align: center;
+}
+
+.deadlands-classic .dc-newspaper-ad-content h4 {
+  font-family: 'Times New Roman', serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+}
+
+.deadlands-classic .dc-newspaper-ad-content p {
+  font-size: 0.82em;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.deadlands-classic .dc-newspaper-ad-content em {
+  font-size: 0.9em;
+}
+
+/* Colophon (footer) */
+.deadlands-classic .dc-newspaper-colophon {
+  font-size: 0.78em;
+  text-align: center;
+  color: #555;
+  font-style: italic;
+  padding-top: 8px;
+}
+
+/* When newspaper is viewed in the smaller item_viewer, scale down */
+.deadlands-classic .viewer-text-content .dc-newspaper {
+  padding: 12px 16px;
+  max-width: 100%;
+}
+
+.deadlands-classic .viewer-text-content .dc-newspaper-name {
+  font-size: 2em;
+}
+
+.deadlands-classic .viewer-text-content .dc-newspaper-headline {
+  font-size: 1.4em;
+}

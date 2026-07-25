@@ -1,0 +1,70 @@
+<div class="document-reader">
+	{{#if (eq content_type "ia_book")}}
+		{{#if embed_url}}
+			<iframe src="{{embed_url}}" class="document-iframe" allowfullscreen="true"
+				style="width:100%; height:calc(100% - 40px); border:none;"></iframe>
+			<div class="document-ia-footer">
+				<a href="{{item.url}}" target="_blank" title="{{localize 'dc.containers.doc.open_in_archive'}}">
+					<i class="fas fa-up-right-from-square"></i> {{localize "dc.containers.doc.open_in_archive"}}
+				</a>
+			</div>
+		{{else}}
+			<div class="document-placeholder">
+				<i class="fas fa-book"></i>
+				<p>{{localize "dc.containers.doc.no_url"}}</p>
+			</div>
+		{{/if}}
+	{{else if (eq content_type "url")}}
+		{{#if embed_url}}
+			<iframe src="{{embed_url}}" class="document-iframe"
+				style="width:100%; height:100%; border:none;"></iframe>
+		{{else}}
+			<div class="document-placeholder">
+				<i class="fas fa-link"></i>
+				<p>{{localize "dc.containers.doc.no_url"}}</p>
+			</div>
+		{{/if}}
+	{{else if (eq content_type "image")}}
+		<div class="document-image-container">
+			{{#if item.image}}
+				<img src="{{item.image}}" alt="{{item.label}}" class="document-image" />
+			{{else}}
+				<div class="document-placeholder">
+					<i class="fas fa-image"></i>
+					<p>{{localize "dc.containers.doc.no_image"}}</p>
+				</div>
+			{{/if}}
+		</div>
+	{{else if (eq content_type "text")}}
+		<div class="document-text-container scroll-container">
+			<div class="document-text scroll" data-scroll-id="document-text">
+				{{#if item.text_content}}
+					{{{item.text_content}}}
+				{{else}}
+					<div class="document-placeholder">
+						<i class="fas fa-file-lines"></i>
+						<p>{{localize "dc.containers.doc.no_text"}}</p>
+					</div>
+				{{/if}}
+			</div>
+		</div>
+	{{else if (eq content_type "newspaper")}}
+		<div class="document-text-container scroll-container">
+			<div class="document-text scroll" data-scroll-id="document-text">
+				{{#if newspaper_html}}
+					{{{newspaper_html}}}
+				{{else}}
+					<div class="document-placeholder">
+						<i class="fas fa-newspaper"></i>
+						<p>{{localize "dc.containers.doc.no_text"}}</p>
+					</div>
+				{{/if}}
+			</div>
+		</div>
+	{{else}}
+		<div class="document-placeholder">
+			<i class="fas fa-file"></i>
+			<p>{{localize "dc.containers.doc.unknown_type"}}</p>
+		</div>
+	{{/if}}
+</div>
