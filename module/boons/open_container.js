@@ -62,6 +62,7 @@ export default function open_container_boon(boon, context) {
 // ─── Registration ─────────────────────────────────────────────────────────
 
 function register_boons() {
+	game.dc.register_localization("dc.boons.open_container", "Open Container");
 	game.dc.boon_manager.register_boon_type("open_container", open_container_boon);
 
 	const triggers = game.dc.system.triggers;
