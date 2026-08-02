@@ -9,6 +9,35 @@ import {
   create_journal_entry,
 } from './document_data_utils.js';
 import { render_journal_html } from './journal_render.js';
+import { build_quickfill_html, wire_quickfill } from './editor_quickfill.js';
+
+// Quick-fill presets for the journal editor — each adds a new entry.
+const QUICKFILL_PRESETS = [
+  {
+    id: 'trail',
+    label: 'Trail Entry',
+    icon: 'fa-route',
+    apply: (d) => ({ ...d, entries: [...(d.entries || []), create_journal_entry({ date: '', title: 'On the Trail', body: 'Spotted dust on the horizon to the east — riders, though I could not make out their number. Made camp at a dry wash and kept a fire low. Something does not feel right about this country.' })] }),
+  },
+  {
+    id: 'combat',
+    label: 'Combat Report',
+    icon: 'fa-bolt',
+    apply: (d) => ({ ...d, entries: [...(d.entries || []), create_journal_entry({ date: '', title: 'Gunfight', body: 'Shots broke out at the saloon around sundown. Two men dead, one wounded. The shooter fled north on horseback. I gave chase but lost the trail at the river crossing.' })] }),
+  },
+  {
+    id: 'discovery',
+    label: 'Discovery',
+    icon: 'fa-eye',
+    apply: (d) => ({ ...d, entries: [...(d.entries || []), create_journal_entry({ date: '', title: 'A Finding', body: 'Found strange marks on the rocks above the old mine shaft — not animal tracks and not any writing I know. The air was cold there, though the sun was high. I did not stay long.' })] }),
+  },
+  {
+    id: 'observation',
+    label: 'Observation',
+    icon: 'fa-binoculars',
+    apply: (d) => ({ ...d, entries: [...(d.entries || []), create_journal_entry({ date: '', title: 'Observations', body: 'The town has been quiet today. A stranger arrived on the morning stage — tall man, dark coat, did not speak to anyone. He took a room at the hotel and has not come out since. Worth watching.' })] }),
+  },
+];
 
 function read_journal_from_dom(root, data) {
   const get = (name) => root.querySelector(`[name="${name}"]`)?.value ?? '';
@@ -43,7 +72,15 @@ const journal_editor_config = {
   labels: {
     add_entry: 'journal_add_entry',
   },
+  enrich_context(ctx) {
+    ctx.quickfill_html = build_quickfill_html({
+      label: game.i18n.localize('dc.containers.doc.quickfill_label'),
+      buttons: QUICKFILL_PRESETS.map((p) => ({ id: p.id, label: p.label, icon: p.icon })),
+    });
+  },
   wire_events(root) {
+    wire_quickfill(root, this, { buttons: QUICKFILL_PRESETS });
+
     root.querySelector('[data-action="addEntry"]')?.addEventListener('click', (event) => {
       event.preventDefault();
       this._read_from_dom();

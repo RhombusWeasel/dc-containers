@@ -9,6 +9,52 @@ import {
   create_map_marker,
 } from './document_data_utils.js';
 import { render_map_html } from './map_render.js';
+import { build_quickfill_html, wire_quickfill } from './editor_quickfill.js';
+
+// Quick-fill presets for the map editor — preset marker sets.
+const QUICKFILL_PRESETS = [
+  {
+    id: 'town',
+    label: 'Town Buildings',
+    icon: 'fa-city',
+    apply: (d) => ({ ...d, markers: [
+      create_map_marker({ x_pct: 20, y_pct: 30, label: "Sheriff's Office", icon: 'fa-star' }),
+      create_map_marker({ x_pct: 50, y_pct: 35, label: 'Saloon', icon: 'fa-beer-mug-empty' }),
+      create_map_marker({ x_pct: 35, y_pct: 60, label: 'General Store', icon: 'fa-store' }),
+      create_map_marker({ x_pct: 70, y_pct: 55, label: "Doctor's Office", icon: 'fa-staff-snake' }),
+      create_map_marker({ x_pct: 80, y_pct: 25, label: 'Livery Stable', icon: 'fa-horse' }),
+      create_map_marker({ x_pct: 15, y_pct: 70, label: 'Train Depot', icon: 'fa-train' }),
+    ] }),
+  },
+  {
+    id: 'trail',
+    label: 'Trail Stops',
+    icon: 'fa-route',
+    apply: (d) => ({ ...d, markers: [
+      create_map_marker({ x_pct: 15, y_pct: 80, label: 'Start', icon: 'fa-flag' }),
+      create_map_marker({ x_pct: 40, y_pct: 55, label: 'Waterhole', icon: 'fa-tint' }),
+      create_map_marker({ x_pct: 65, y_pct: 40, label: 'Landmark', icon: 'fa-mountain' }),
+      create_map_marker({ x_pct: 85, y_pct: 20, label: 'Destination', icon: 'fa-flag-checkered' }),
+    ] }),
+  },
+  {
+    id: 'mine',
+    label: 'Mine Layout',
+    icon: 'fa-hammer',
+    apply: (d) => ({ ...d, markers: [
+      create_map_marker({ x_pct: 50, y_pct: 10, label: 'Main Entrance', icon: 'fa-door-open' }),
+      create_map_marker({ x_pct: 30, y_pct: 45, label: 'Shaft A', icon: 'fa-hammer' }),
+      create_map_marker({ x_pct: 65, y_pct: 50, label: 'Shaft B', icon: 'fa-hammer' }),
+      create_map_marker({ x_pct: 50, y_pct: 80, label: 'Deep Level', icon: 'fa-arrow-down' }),
+    ] }),
+  },
+  {
+    id: 'clear',
+    label: 'Clear Markers',
+    icon: 'fa-eraser',
+    apply: (d) => ({ ...d, markers: [] }),
+  },
+];
 
 function read_map_from_dom(root, data) {
   const get = (name) => root.querySelector(`[name="${name}"]`)?.value ?? '';
@@ -45,7 +91,15 @@ const map_editor_config = {
     add_marker: 'map_add_marker',
     click_hint: 'map_click_hint',
   },
+  enrich_context(ctx) {
+    ctx.quickfill_html = build_quickfill_html({
+      label: game.i18n.localize('dc.containers.doc.quickfill_label'),
+      buttons: QUICKFILL_PRESETS.map((p) => ({ id: p.id, label: p.label, icon: p.icon })),
+    });
+  },
   wire_events(root) {
+    wire_quickfill(root, this, { buttons: QUICKFILL_PRESETS });
+
     root.querySelector('[data-action="pickImage"]')?.addEventListener('click', async (event) => {
       event.preventDefault();
       const input = root.querySelector('[name="image"]');

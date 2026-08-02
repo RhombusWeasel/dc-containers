@@ -28,11 +28,13 @@ import { open_letter_editor } from "./letter_editor.js";
 import { open_journal_editor } from "./journal_editor.js";
 import { open_ledger_editor } from "./ledger_editor.js";
 import { open_map_editor } from "./map_editor.js";
-import { open_sourcebook_editor } from "./sourcebook_editor.js";
+import { open_book_editor } from "./book_editor.js";
 import { open_web_page_editor } from "./web_page_editor.js";
 import { open_other_editor } from "./other_editor.js";
 import { generate_wanted_poster_data } from "./wanted_poster_editor.js";
 import { generate_letter_data } from "./letter_editor.js";
+import { wire_template_gallery } from "./document_template_gallery.js";
+import { DOCUMENT_TEMPLATES, get_template_groups } from "./document_templates.js";
 
 const MODULE_ID = "dc-containers";
 
@@ -60,144 +62,8 @@ async function use_handler(actor, path, key, item) {
 }
 
 // ─── Pre-built document templates ─────────────────────────────────────────
-
-const document_templates = {
-	sourcebook_template: {
-		label: "Sourcebook (Internet Archive)",
-		cost: 5000,
-		quantity: 1,
-		weight: 2,
-		category: "sourcebook",
-		content_type: "ia_book",
-		url: "",
-		text_content: "",
-		image: "",
-		sourcebook_data: null,
-		rarity: "rare",
-		description: "A full sourcebook hosted on the Internet Archive. Use the sourcebook editor to set the archive.org URL and metadata.",
-		user_made: false
-	},
-	journal_template: {
-		label: "Journal / Diary",
-		cost: 500,
-		quantity: 1,
-		weight: 1,
-		category: "journal",
-		content_type: "text",
-		url: "",
-		text_content: "",
-		image: "",
-		journal_data: null,
-		rarity: "uncommon",
-		description: "A handwritten journal or diary. Use the journal editor to add dated entries.",
-		user_made: false
-	},
-	ledger_template: {
-		label: "Ledger",
-		cost: 200,
-		quantity: 1,
-		weight: 1,
-		category: "ledger",
-		content_type: "text",
-		url: "",
-		text_content: "",
-		image: "",
-		ledger_data: null,
-		rarity: "common",
-		description: "An account ledger. Use the ledger editor to record debits and credits.",
-		user_made: false
-	},
-	letter_template: {
-		label: "Letter",
-		cost: 100,
-		quantity: 1,
-		weight: 0,
-		category: "letter",
-		content_type: "text",
-		url: "",
-		text_content: "",
-		image: "",
-		letter_data: null,
-		rarity: "common",
-		description: "A personal or formal letter. Use the letter editor for sender, recipient, and body.",
-		user_made: false
-	},
-	wanted_poster_template: {
-		label: "Wanted Poster",
-		cost: 0,
-		quantity: 1,
-		weight: 0,
-		category: "wanted_poster",
-		content_type: "image",
-		url: "",
-		text_content: "",
-		image: "",
-		wanted_poster_data: null,
-		rarity: "common",
-		description: "A wanted poster. Use the poster editor for name, crime, reward, and portrait.",
-		user_made: false
-	},
-	newspaper_template: {
-		label: "Newspaper",
-		cost: 50,
-		quantity: 1,
-		weight: 1,
-		category: "newspaper",
-		content_type: "newspaper",
-		url: "",
-		text_content: "",
-		newspaper_data: null,
-		image: "",
-		rarity: "common",
-		description: "A periodical or broadsheet. Use the newspaper editor to create procedural layout content.",
-		user_made: false
-	},
-	map_template: {
-		label: "Map",
-		cost: 1000,
-		quantity: 1,
-		weight: 0,
-		category: "map",
-		content_type: "image",
-		url: "",
-		text_content: "",
-		image: "",
-		map_data: null,
-		rarity: "uncommon",
-		description: "A map. Use the map editor to set the image and place markers.",
-		user_made: false
-	},
-	web_page_template: {
-		label: "Web Page",
-		cost: 0,
-		quantity: 1,
-		weight: 0,
-		category: "web_page",
-		content_type: "url",
-		url: "",
-		text_content: "",
-		image: "",
-		web_page_data: null,
-		rarity: "common",
-		description: "A web page embedded in an iframe. Use the web page editor to set the URL.",
-		user_made: false
-	},
-	other_template: {
-		label: "Other Document",
-		cost: 0,
-		quantity: 1,
-		weight: 0,
-		category: "other",
-		content_type: "text",
-		url: "",
-		text_content: "",
-		image: "",
-		other_data: null,
-		rarity: "common",
-		description: "A miscellaneous readable document. Use the document editor for title and body.",
-		user_made: false
-	}
-};
+// Rich, pre-filled templates now live in document_templates.js.
+const document_templates = DOCUMENT_TEMPLATES;
 
 // ─── Public API ───────────────────────────────────────────────────────────
 
@@ -215,7 +81,7 @@ function create_template(category, overrides = {}) {
 		cost: 0,
 		quantity: 1,
 		weight: 1,
-		category: category || 'sourcebook',
+		category: category || 'book',
 		content_type: 'ia_book',
 		url: '',
 		text_content: '',
@@ -236,7 +102,7 @@ function build_new_object() {
 		cost: 0,
 		quantity: 1,
 		weight: 1,
-		category: 'sourcebook',
+		category: 'book',
 		content_type: 'ia_book',
 		url: '',
 		text_content: '',
@@ -332,15 +198,17 @@ export function register_documents() {
 	});
 
 	game.dc.register_gear_partial("documents", {
+		label: "Documents",
 		player_partial: "modules/dc-containers/templates/documents/gear_documents.hbs",
 		gm_partial: "modules/dc-containers/templates/documents/gm_documents.hbs",
-		gm_tab: { id: "documents", label: "dc.containers.doc.header", order: 50 },
+		gm_tab: { id: "documents", label: "Documents", order: 50 },
+		order: 50,
 	});
 
 	game.dc.register_gm_tab("dc-containers.documents", {
 		group: "gear",
 		id: "documents",
-		label: "dc.containers.doc.header",
+		label: "Documents",
 		order: 50,
 	});
 
@@ -348,6 +216,16 @@ export function register_documents() {
 
 	Hooks.on("dcItemViewerPrepareContext", async (viewer, context) => {
 		await _prepare_viewer_context(context);
+	});
+
+	// Wire up the template gallery in the GM Documents tab after each render.
+	// The GM sheet is ApplicationV2, so we use the renderApplicationV2 hook.
+	Hooks.on("renderApplicationV2", (app, element) => {
+		const el = element instanceof HTMLElement ? element : element?.[0];
+		if (!el) return;
+		const gallery = el.querySelector?.(".dc-doc-template-gallery-placeholder");
+		if (!gallery) return;
+		wire_template_gallery(el, app);
 	});
 
 	Hooks.on("dcEditorRender", (editor, element) => {
@@ -401,9 +279,10 @@ export function register_documents() {
 			open_journal_editor,
 			open_ledger_editor,
 			open_map_editor,
-			open_sourcebook_editor,
+			open_book_editor,
 			open_web_page_editor,
 			open_other_editor,
+			get_template_groups,
 		};
 	}
 

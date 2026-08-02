@@ -9,7 +9,7 @@ import { letter_editor_config, open_letter_editor } from './letter_editor.js';
 import { journal_editor_config, open_journal_editor } from './journal_editor.js';
 import { ledger_editor_config, open_ledger_editor } from './ledger_editor.js';
 import { map_editor_config, open_map_editor } from './map_editor.js';
-import { sourcebook_editor_config, open_sourcebook_editor } from './sourcebook_editor.js';
+import { book_editor_config, open_book_editor } from './book_editor.js';
 import { web_page_editor_config, open_web_page_editor } from './web_page_editor.js';
 import { other_editor_config, open_other_editor } from './other_editor.js';
 
@@ -33,7 +33,7 @@ const GENERIC_CONFIGS = [
   journal_editor_config,
   ledger_editor_config,
   map_editor_config,
-  sourcebook_editor_config,
+  book_editor_config,
   web_page_editor_config,
   other_editor_config,
 ];
@@ -44,7 +44,7 @@ const OPEN_BY_CATEGORY = {
   journal: open_journal_editor,
   ledger: open_ledger_editor,
   map: open_map_editor,
-  sourcebook: open_sourcebook_editor,
+  book: open_book_editor,
   web_page: open_web_page_editor,
   other: open_other_editor,
 };

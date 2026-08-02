@@ -3,6 +3,10 @@
   {{#if (eq this.actor.system.tabs.gear.tabs.documents.hint true)}}
   <div class="dc-hint">{{localize_array "dc.containers.doc.hint" columns=true}}</div>
   {{/if}}
+
+  {{!-- Template Gallery — injected by document_template_gallery.js --}}
+  <div class="dc-doc-template-gallery-placeholder"></div>
+
   <div class="center">
     <a data-action="newPath" class="new-path bold" data-path="gear.documents">{{localize "dc.containers.doc.add"}}</a>
   </div>

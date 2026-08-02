@@ -41,7 +41,7 @@ async function render_document_html(item) {
     case 'other':
       if (structured) return { html: await render_other_html(structured), embed_url: '' };
       break;
-    case 'sourcebook': {
+    case 'book': {
       const url = structured?.url || item.url || '';
       return { html: '', embed_url: build_embed_url(url) };
     }

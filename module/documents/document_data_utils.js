@@ -9,7 +9,7 @@ const DOCUMENT_DATA_KEYS = {
   journal: 'journal_data',
   ledger: 'ledger_data',
   map: 'map_data',
-  sourcebook: 'sourcebook_data',
+  book: 'book_data',
   web_page: 'web_page_data',
   other: 'other_data',
 };
@@ -22,7 +22,7 @@ function document_data_defaults() {
     journal_data: null,
     ledger_data: null,
     map_data: null,
-    sourcebook_data: null,
+    book_data: null,
     web_page_data: null,
     other_data: null,
   };
@@ -104,7 +104,7 @@ function create_map_marker(overrides = {}) {
   return { x_pct: 50, y_pct: 50, label: '', icon: 'fa-location-dot', ...overrides };
 }
 
-function create_sourcebook_data(overrides = {}) {
+function create_book_data(overrides = {}) {
   return {
     url: '',
     title: '',
@@ -181,9 +181,11 @@ function migrate_map_data(item) {
   });
 }
 
-function migrate_sourcebook_data(item) {
+function migrate_book_data(item) {
+  if (item.book_data) return foundry.utils.deepClone(item.book_data);
+  // Migrate legacy sourcebook_data if present
   if (item.sourcebook_data) return foundry.utils.deepClone(item.sourcebook_data);
-  return create_sourcebook_data({
+  return create_book_data({
     url: item.url || '',
     title: item.label || '',
   });
@@ -211,7 +213,7 @@ const MIGRATE_BY_CATEGORY = {
   journal: migrate_journal_data,
   ledger: migrate_ledger_data,
   map: migrate_map_data,
-  sourcebook: migrate_sourcebook_data,
+  book: migrate_book_data,
   web_page: migrate_web_page_data,
   other: migrate_other_data,
 };
@@ -234,7 +236,7 @@ function preview_for_category(category, data) {
       return truncate_preview(data.account_name);
     case 'map':
       return truncate_preview(data.title);
-    case 'sourcebook':
+    case 'book':
       return truncate_preview(data.title || data.url);
     case 'web_page':
       return truncate_preview(data.title || data.url);
@@ -257,7 +259,7 @@ export {
   create_ledger_row,
   create_map_data,
   create_map_marker,
-  create_sourcebook_data,
+  create_book_data,
   create_web_page_data,
   create_other_data,
   body_to_paragraphs,
@@ -267,7 +269,7 @@ export {
   migrate_journal_data,
   migrate_ledger_data,
   migrate_map_data,
-  migrate_sourcebook_data,
+  migrate_book_data,
   migrate_web_page_data,
   migrate_other_data,
   migrate_category_data,

@@ -25,7 +25,7 @@
 			"newspaper": "Newspaper"
 		},
 		"categories": {
-			"sourcebook": "Sourcebook",
+			"book": "Book",
 			"journal": "Journal",
 			"ledger": "Ledger",
 			"wanted_poster": "Wanted Poster",
@@ -300,11 +300,11 @@
 		"map_add_marker": "Add Marker",
 		"map_marker_label": "Marker Label",
 		"map_click_hint": "Click the map preview to place a marker at that position.",
-		"sourcebook_editor_title": "Sourcebook Editor",
-		"sourcebook_title": "Title",
-		"sourcebook_author": "Author",
-		"sourcebook_default_page": "Default Page",
-		"sourcebook_notes": "Notes",
+		"book_editor_title": "Book Editor",
+		"book_title": "Title",
+		"book_author": "Author",
+		"book_default_page": "Default Page",
+		"book_notes": "Notes",
 		"web_page_editor_title": "Web Page Editor",
 		"web_page_title": "Page Title",
 		"web_page_notes": "Notes",
@@ -314,6 +314,12 @@
 		"other_style_plain": "Plain",
 		"other_style_notice": "Public Notice",
 		"other_style_proclamation": "Proclamation",
-		"other_body": "Body"
+		"other_body": "Body",
+		"template_gallery_title": "Document Templates",
+		"template_gallery_hint": "Click a card or drag onto the table to create a new document.",
+		"template_added": "Created \"{name}\" from template.",
+		"quickfill_label": "Quick Fill:",
+		"quickfill_randomize": "Randomize",
+		"quickfill_clear": "Clear"
 	}
 }

@@ -3,7 +3,7 @@
  */
 
 const CATEGORY_CONTENT_TYPE = {
-  sourcebook: 'ia_book',
+  book: 'ia_book',
   journal: 'text',
   ledger: 'text',
   letter: 'text',
@@ -26,6 +26,15 @@ function content_type_for_category(category) {
 
 function normalize_document_data(data) {
   if (!data) return data;
+  // Migrate legacy 'sourcebook' category to 'book'
+  if (data.category === 'sourcebook') {
+    data.category = 'book';
+    // Migrate sourcebook_data → book_data if not already done
+    if (data.sourcebook_data && !data.book_data) {
+      data.book_data = data.sourcebook_data;
+      delete data.sourcebook_data;
+    }
+  }
   data.content_type = content_type_for_category(data.category);
   return data;
 }

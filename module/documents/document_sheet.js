@@ -49,7 +49,7 @@ class DocumentSheet extends HandlebarsApplicationMixin(ApplicationV2) {
 		context.embed_url = rendered.embed_url || '';
 		context.newspaper_html = this.item.category === 'newspaper' ? context.document_html : '';
 
-		if (this.item.sourcebook_data?.url) context.item.url = this.item.sourcebook_data.url;
+		if (this.item.book_data?.url) context.item.url = this.item.book_data.url;
 		if (this.item.web_page_data?.url) context.item.url = this.item.web_page_data.url;
 		if (this.item.map_data?.image) context.item.image = this.item.map_data.image;
 		if (this.item.wanted_poster_data?.portrait) context.item.image = this.item.wanted_poster_data.portrait;

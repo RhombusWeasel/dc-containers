@@ -2,6 +2,8 @@
 <div class="document-editor-scroll">
   <p class="notes">{{localize "dc.containers.doc.editor_saved_hint"}}</p>
 
+  {{{quickfill_html}}}
+
   <div class="form-group">
     <label>{{localize "dc.containers.doc.map_title"}}</label>
     <input type="text" name="title" value="{{doc_data.title}}" />
@@ -34,7 +36,27 @@
   <div class="flexrow map-marker-row">
     <span>{{marker.x_pct}}%, {{marker.y_pct}}%</span>
     <input type="text" name="marker_label_{{index}}" value="{{marker.label}}" placeholder="{{localize "dc.containers.doc.map_marker_label"}}" class="flex1" />
-    <input type="text" name="marker_icon_{{index}}" value="{{marker.icon}}" placeholder="fa-location-dot" />
+    <select name="marker_icon_{{index}}">
+      <option value="fa-location-dot" {{#if (eq marker.icon "fa-location-dot")}}selected{{/if}}>Location</option>
+      <option value="fa-flag" {{#if (eq marker.icon "fa-flag")}}selected{{/if}}>Flag</option>
+      <option value="fa-flag-checkered" {{#if (eq marker.icon "fa-flag-checkered")}}selected{{/if}}>Finish</option>
+      <option value="fa-home" {{#if (eq marker.icon "fa-home")}}selected{{/if}}>Building</option>
+      <option value="fa-star" {{#if (eq marker.icon "fa-star")}}selected{{/if}}>Star (Sheriff)</option>
+      <option value="fa-beer-mug-empty" {{#if (eq marker.icon "fa-beer-mug-empty")}}selected{{/if}}>Saloon</option>
+      <option value="fa-store" {{#if (eq marker.icon "fa-store")}}selected{{/if}}>Store</option>
+      <option value="fa-staff-snake" {{#if (eq marker.icon "fa-staff-snake")}}selected{{/if}}>Doctor</option>
+      <option value="fa-horse" {{#if (eq marker.icon "fa-horse")}}selected{{/if}}>Horse</option>
+      <option value="fa-train" {{#if (eq marker.icon "fa-train")}}selected{{/if}}>Train</option>
+      <option value="fa-tint" {{#if (eq marker.icon "fa-tint")}}selected{{/if}}>Water</option>
+      <option value="fa-mountain" {{#if (eq marker.icon "fa-mountain")}}selected{{/if}}>Mountain</option>
+      <option value="fa-hammer" {{#if (eq marker.icon "fa-hammer")}}selected{{/if}}>Mine</option>
+      <option value="fa-door-open" {{#if (eq marker.icon "fa-door-open")}}selected{{/if}}>Entrance</option>
+      <option value="fa-arrow-down" {{#if (eq marker.icon "fa-arrow-down")}}selected{{/if}}>Down</option>
+      <option value="fa-shield" {{#if (eq marker.icon "fa-shield")}}selected{{/if}}>Fort</option>
+      <option value="fa-triangle-exclamation" {{#if (eq marker.icon "fa-triangle-exclamation")}}selected{{/if}}>Hazard</option>
+      <option value="fa-skull" {{#if (eq marker.icon "fa-skull")}}selected{{/if}}>Danger</option>
+      <option value="fa-treasure-chest" {{#if (eq marker.icon "fa-treasure-chest")}}selected{{/if}}>Treasure</option>
+    </select>
     <button type="button" data-action="removeMarker" data-index="{{index}}"><i class="fas fa-trash"></i></button>
   </div>
   {{/each}}

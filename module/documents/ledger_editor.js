@@ -9,6 +9,35 @@ import {
   create_ledger_row,
 } from './document_data_utils.js';
 import { render_ledger_html, compute_ledger_balances } from './ledger_render.js';
+import { build_quickfill_html, wire_quickfill } from './editor_quickfill.js';
+
+// Quick-fill presets for the ledger editor — each adds a new row.
+const QUICKFILL_PRESETS = [
+  {
+    id: 'sale',
+    label: 'Sale',
+    icon: 'fa-hand-holding-dollar',
+    apply: (d) => ({ ...d, rows: [...(d.rows || []), create_ledger_row({ description: 'Sale of goods', credit: '' })] }),
+  },
+  {
+    id: 'purchase',
+    label: 'Purchase',
+    icon: 'fa-cart-shopping',
+    apply: (d) => ({ ...d, rows: [...(d.rows || []), create_ledger_row({ description: 'Purchase — supplies', debit: '' })] }),
+  },
+  {
+    id: 'wage',
+    label: 'Wage Payment',
+    icon: 'fa-coins',
+    apply: (d) => ({ ...d, rows: [...(d.rows || []), create_ledger_row({ description: 'Wage payment — ranch hand', debit: '' })] }),
+  },
+  {
+    id: 'supply',
+    label: 'Supply Order',
+    icon: 'fa-box',
+    apply: (d) => ({ ...d, rows: [...(d.rows || []), create_ledger_row({ description: 'Supply order — dry goods', debit: '' })] }),
+  },
+];
 
 function read_ledger_from_dom(root, data) {
   const get = (name) => root.querySelector(`[name="${name}"]`)?.value ?? '';
@@ -51,7 +80,15 @@ const ledger_editor_config = {
   labels: {
     add_row: 'ledger_add_row',
   },
+  enrich_context(ctx) {
+    ctx.quickfill_html = build_quickfill_html({
+      label: game.i18n.localize('dc.containers.doc.quickfill_label'),
+      buttons: QUICKFILL_PRESETS.map((p) => ({ id: p.id, label: p.label, icon: p.icon })),
+    });
+  },
   wire_events(root) {
+    wire_quickfill(root, this, { buttons: QUICKFILL_PRESETS });
+
     root.querySelector('[data-action="addRow"]')?.addEventListener('click', (event) => {
       event.preventDefault();
       this._read_from_dom();

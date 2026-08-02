@@ -40,7 +40,7 @@ Hooks.once("init", async () => {
 		"modules/dc-containers/templates/documents/ledger_sheet.hbs",
 		"modules/dc-containers/templates/documents/map_editor.hbs",
 		"modules/dc-containers/templates/documents/map_sheet.hbs",
-		"modules/dc-containers/templates/documents/sourcebook_editor.hbs",
+		"modules/dc-containers/templates/documents/book_editor.hbs",
 		"modules/dc-containers/templates/documents/web_page_editor.hbs",
 		"modules/dc-containers/templates/documents/other_editor.hbs",
 		"modules/dc-containers/templates/documents/other_sheet.hbs",
